@@ -3,13 +3,14 @@ import './App.css';
 import kujira from "@util/kujira";
 import Header from "./components/Header";
 import MetaHead from "./components/meta/MetaHead";
-import {Col, notification, Row} from "antd";
+import {Col, Row} from "antd";
 import Balances from "./components/content/Balances";
 import OrderRequest from './components/content/OrderRequest';
 import PendingOrders from "./components/content/PendingOrders";
 import Orders from "./components/content/Orders";
 import Markets from "./components/Markets";
 import data from './data/contracts.json';
+import {handleErrorNotification} from "@util/utils";
 
 const App = () => {
     const [pendingOrders, setPendingOrders] = useState<OrderRequest[]>([]);
@@ -24,27 +25,28 @@ const App = () => {
             clearAll()
             return;
         }
-        onOrdersRefresh()
-            .catch(console.error);
-        onBalanceRefresh();
+        onOrdersRefresh().catch(handleErrorNotification);;
+        onBalanceRefresh().catch(handleErrorNotification);;
     }, [wallet]);
 
     useEffect(() => {
         if (!wallet) return;
-        onBalanceRefresh()
-        onOrdersRefresh().catch(console.error);
+        onBalanceRefresh().catch(handleErrorNotification);
+        onOrdersRefresh().catch(handleErrorNotification);;
     }, [contract]);
 
     const onOrdersRefresh = () => {
         if (!wallet) return Promise.reject();
         return kujira.getOrders(wallet, contract)
             .then(res => setOrders(res))
+            .catch(handleErrorNotification);
     }
 
     const onBalanceRefresh = async () => {
         if (!wallet || contracts.length === 0) return;
         return kujira.getBalances(wallet, contracts)
-            .then(res => setBalances(res));
+            .then(res => setBalances(res))
+            .catch(handleErrorNotification);;
     }
 
     const onConnectWallet = async (chainId: string) => {
@@ -58,10 +60,7 @@ const App = () => {
             .then(() => setPendingOrders([]))
             .then(() => onOrdersRefresh())
             .then(() => onBalanceRefresh())
-            .catch((e: Error) => notification.open({
-                message: e.name,
-                description: e.message,
-            }));
+            .catch(handleErrorNotification);
     }
 
     const onDisconnectWallet = () => setWallet(undefined);
