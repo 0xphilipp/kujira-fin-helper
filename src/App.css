@@ -1,0 +1,80 @@
+.body > .ant-row {
+    margin: 10px;
+}
+
+.header {
+    background-color: #22242f;
+    padding: 0 10px;
+}
+
+.panel {
+    margin: 5px;
+    padding: 5px;
+    background-color: rgba(34,36,47,.5)
+}
+
+.content .ant-col {
+    margin: 10px;
+}
+.balances {
+    padding: 10px;
+    margin: 0 5px 5px 0;
+    background-color: rgba(34,36,47,.5);
+}
+
+.orderRequest {
+    padding: 10px;
+    margin: 0 5px 5px 0;
+    background-color: rgba(34,36,47,.5);
+}
+
+.orderPending {
+    padding: 10px;
+    margin: 0 0 5px 0;
+    background-color: rgba(34,36,47,.5);
+}
+
+.orders {
+    padding: 10px;
+    background-color: rgba(34,36,47,.5);
+}
+
+.buttonBuy {
+    width: 100%;
+    background: #60fbd0;
+    border: none;
+    color: black;
+}
+
+.buttonBuy:hover {
+    background: #5ab69c;
+}
+
+.buttonSell {
+    width: 100%;
+    background: #e53935;
+    border: none;
+    color: white;
+}
+
+.buttonSell:hover {
+    background: #c40c08;
+}
+
+.colorGray {
+    color: #607d8b !important;
+}
+
+.ant-input-number-input {
+    text-align: right;
+}
+
+.input-number-no-handler > .ant-input-number-handler-wrap {
+    display: none;
+}
+
+.borderless-input-number .ant-input-number-group-addon {
+    border: 0;
+    background: none;
+    padding: 0;
+}
