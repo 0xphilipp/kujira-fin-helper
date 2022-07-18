@@ -176,18 +176,20 @@ const kujira = {
         const finClient: FinClient = new FinClient(client, account.address, contract.address);
         return finClient.retractOrders({ orderIdxs: ordersIdx });
     },
-    async getOrders(wallet: Wallet, contract: Contract): Promise<Order[]> {
+    async getOrders(wallet: Wallet, contract: Contract, orders: Order[] = []): Promise<Order[]> {
         const {client, account} = wallet;
         const finClient: FinClient = new FinClient(client, account.address, contract.address);
-        return finClient.ordersByUser({
-            address: account.address, limit: 100
+        const MAXIMUM_CONTRACT_LIMIT = 31;
+        const responses = await finClient.ordersByUser({
+            address: account.address,
+            limit: MAXIMUM_CONTRACT_LIMIT,
+            startAfter: orders.length > 0 ? orders[orders.length - 1].idx : undefined,
         })
-            // .then(res => {
-            //     console.log(res.orders.sort((o1, o2) => +o1.quote_price > +o2.quote_price ? 1 : -1));
-            //     return res;
-            // })
-            .then(res => res.orders.map(o => toOrder(contract, o)))
-
+            .then(res => res.orders.map(o => toOrder(contract, o)));
+        if (responses.length === MAXIMUM_CONTRACT_LIMIT) {
+            return this.getOrders(wallet, contract, [...orders, ...responses])
+        }
+        return [...orders, ...responses];
     },
     async send(wallet: Wallet, sendTo: string, amount: string, denom: string): Promise<DeliverTxResponse> {
         const fee = {
