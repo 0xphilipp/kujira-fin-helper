@@ -106,6 +106,7 @@ const OrderRequest = ({wallet, contract, balances, addOrders, changePrice}: Orde
                                 addonAfter={<div style={{width: 55}}>{quoteSymbol}</div>}
                                 controls={false}
                                 onChange={() => changeSimulationState({})}
+                                step={10 ** (-1 * (contract?.price_precision.decimal_places || 3))}
                             />
                         </Form.Item>
                         <Form.Item name={'amount'} initialValue={0}

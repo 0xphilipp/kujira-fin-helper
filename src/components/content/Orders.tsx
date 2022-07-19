@@ -86,15 +86,14 @@ const Orders = ({wallet, orders, contract, onOrderChanged}: OrdersProps) => {
                     onChange: (_, keys) => setSelectedOrders(keys),
                     selectedRowKeys: selectedOrders.map(o => o.idx) || []
                 }}
-                pagination={{
-                    position: ['bottomCenter']
-                }}
+                scroll={{y: 500 }}
+                pagination={false}
                 columns={[
-                    {title: 'IDX', render(o: Order) { return o.idx}},
-                    {title: 'Date', render(o: Order) { return toDateString(o.created_at)}},
+                    {title: 'IDX', render(o: Order) { return o.idx}, width: 100},
+                    {title: 'Date', render(o: Order) { return toDateString(o.created_at)}, width: 250},
                     {
                         title: 'Side',
-                        width: 50,
+                        width: 100,
                         render(o: Order) { return o.side},
                         filters: [
                             {text: 'Sell', value: 'Sell'},
@@ -104,6 +103,7 @@ const Orders = ({wallet, orders, contract, onOrderChanged}: OrdersProps) => {
                     },
                     {
                         title: 'Price',
+                        width: 200,
                         align: 'right',
                         render(o: Order) {
                             return <OrderPrice contract={contract} order={o} />
