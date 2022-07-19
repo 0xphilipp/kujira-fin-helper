@@ -26,6 +26,8 @@ const PendingOrders = ({onOrderSubmit, onCancel, pendingOrders}: PendingOrdersPr
             </Row>
             <Table
                 rowKey={'uuid'}
+                scroll={{y: 500 }}
+                pagination={false}
                 columns={[
                     {
                         title: 'Side',
@@ -35,7 +37,8 @@ const PendingOrders = ({onOrderSubmit, onCancel, pendingOrders}: PendingOrdersPr
                         align: 'right',
                         render(o: OrderRequest) {
                             return <OrderRequestPrice order={o} />;
-                        }
+                        },
+                        sorter: (a, b) => +a.price - +b.price,
                     }, {
                         title: 'Amount',
                         align: 'right',
