@@ -13,7 +13,7 @@ const PendingOrders = ({onOrderSubmit, onCancel, pendingOrders}: PendingOrdersPr
         <div>
             <Row justify={"space-between"}>
                 <Col>
-                    <h2>Pending</h2>
+                    <h2>Pending ({pendingOrders.length})</h2>
                 </Col>
                 <Col>
                     <Button
