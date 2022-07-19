@@ -192,10 +192,6 @@ const kujira = {
         return [...orders, ...responses];
     },
     async send(wallet: Wallet, sendTo: string, amount: string, denom: string): Promise<DeliverTxResponse> {
-        const fee = {
-            amount: coins(500000, 'ukuji'),
-            gas: '200000',
-        }
         const {client, account} = wallet;
         const msg: MsgSend = MsgSend.fromPartial({
             fromAddress: account.address,
@@ -206,7 +202,7 @@ const kujira = {
             typeUrl: "/cosmos.bank.v1beta1.MsgSend",
             value: msg,
         };
-        return client.signAndBroadcast(account.address, [msgAny], fee, '1');
+        return client.signAndBroadcast(account.address, [msgAny], 'auto', '1');
     },
     async ordersWithdraw(wallet: Wallet, contract: Contract, orders: Order[]) {
         const client = new kujiraClient.FinClient(wallet.client, wallet.account.address, contract.address)
