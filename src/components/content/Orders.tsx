@@ -1,49 +1,41 @@
 import {Button, Col, Row, Table, Tabs} from "antd";
 import {useEffect, useMemo, useState} from "react";
-import kujira from "../../util/kujira";
-import {toDateString} from "@util/utils";
+import {handleErrorNotification, toDateString} from "@util/utils";
 import OrderPrice from "../order/OrderPrice";
 import OrderAmount from "../order/OrderAmount";
+import useOrders from "@hooks/useOrders";
+import useContract from "@hooks/useContract";
 
 interface OrdersProps {
-    wallet: Wallet | undefined,
-    orders: Order[];
-    contract: Contract;
-    onOrderChanged: Function;
 }
 
-const Orders = ({wallet, orders, contract, onOrderChanged}: OrdersProps) => {
-
+const Orders = ({}: OrdersProps) => {
+    const {contract} = useContract();
+    const {orders, postOrdersWithdraw, postCancelOrder} = useOrders();
     const [tab, setTab] = useState('All')
-
     const [selectedOrders, setSelectedOrders] = useState<Order[]>([]);
-
-    useEffect(() => setSelectedOrders([]), [orders, tab]);
-
     const [filteredOrders, setFilteredOrders] = useState(orders);
+    const filledOrdersLength = useMemo(() => orders.filter(o => +o.filled_amount > 0).length, [orders]);
+    useEffect(() => setSelectedOrders([]), [orders, tab]);
 
     const counts = useMemo(() => ({
         Open: orders.filter(o => o.state === 'Open').length,
         Partial: orders.filter(o => o.state === 'Partial').length,
         Closed: orders.filter(o => o.state === 'Closed').length,
-    }), [orders])
+    }), [orders]);
 
     useEffect(() => {
         setFilteredOrders(tab === 'All' ? orders : orders.filter(o => o.state === tab));
     }, [orders, tab]);
 
     const onWithdrawClicked = () => {
-        if (!wallet) return;
-        kujira.ordersWithdraw(wallet, contract, orders)
-            .then(() => onOrderChanged())
-            .catch(console.error)
+        postOrdersWithdraw(orders)
+            .catch(handleErrorNotification)
     }
 
     const onCancelClicked = () => {
-        if (!wallet) return;
-        kujira.ordersCancel(wallet, contract, selectedOrders.map(o => `${o.idx}`))
-            .then(() => onOrderChanged())
-            .catch(console.error)
+        postCancelOrder(selectedOrders)
+            .catch(handleErrorNotification)
     }
 
     return (
@@ -62,8 +54,8 @@ const Orders = ({wallet, orders, contract, onOrderChanged}: OrdersProps) => {
                     <Row gutter={8}>
                         <Col>
                             <Button
-                                type={orders.filter(o => +o.filled_amount > 0).length > 0  ? 'primary' : 'default'}
-                                onClick={() => orders.filter(o => +o.filled_amount > 0).length > 0 && onWithdrawClicked()}
+                                type={filledOrdersLength ? 'primary' : 'default'}
+                                onClick={() => filledOrdersLength && onWithdrawClicked()}
                             >
                                 Claim All
                             </Button>
@@ -106,7 +98,7 @@ const Orders = ({wallet, orders, contract, onOrderChanged}: OrdersProps) => {
                         width: 200,
                         align: 'right',
                         render(o: Order) {
-                            return <OrderPrice contract={contract} order={o} />
+                            return <OrderPrice order={o} />
                         },
                         sorter: (a, b) => +a.quote_price - +b.quote_price,
                     },

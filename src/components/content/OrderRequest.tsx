@@ -1,18 +1,20 @@
-import {Button, Card, Checkbox, Col, Descriptions, Form, InputNumber, Row, Select, Tabs} from "antd";
+import {Button, Card, Checkbox, Col, Descriptions, Form, InputNumber, Row, Tabs} from "antd";
 import {useEffect, useMemo, useState} from "react";
 import {v4 as uuidv4} from 'uuid';
 import {toSymbol} from "@util/kujira";
+import useWallet from "@hooks/useWallet";
+import useBalances from "@hooks/useBalances";
+import useContract from "@hooks/useContract";
 
 interface OrderRequestProps {
-    onOrderFinished: (value: any) => void;
-    wallet: Wallet | undefined;
-    contract: Contract | undefined;
-    balances: Balance[];
     addOrders: (orders: OrderRequest[]) => Promise<void>;
     changePrice: number;
 }
 
-const OrderRequest = ({wallet, contract, balances, addOrders, changePrice}: OrderRequestProps) => {
+const OrderRequest = ({addOrders, changePrice}: OrderRequestProps) => {
+    const {contract} = useContract();
+    const {wallet} = useWallet();
+    const {balances} = useBalances();
     const [form] = Form.useForm();
     const [formOption] = Form.useForm();
     const [simulationState, changeSimulationState] = useState({});
@@ -24,6 +26,7 @@ const OrderRequest = ({wallet, contract, balances, addOrders, changePrice}: Orde
     } : {baseSymbol: undefined, quoteSymbol: undefined, base: undefined, quote: undefined};
     const [multiple, setMultiple] = useState(false);
     const bals = useMemo(() => {
+        if (!balances) return [0, 0];
         return [
             balances.filter(b => b.denom === base)[0]?.amount || 0,
             balances.filter(b => b.denom === quote)[0]?.amount || 0,

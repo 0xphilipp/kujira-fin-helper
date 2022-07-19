@@ -210,10 +210,10 @@ const kujira = {
     },
     async ordersWithdraw(wallet: Wallet, contract: Contract, orders: Order[]) {
         const client = new kujiraClient.FinClient(wallet.client, wallet.account.address, contract.address)
-        return client.withdrawOrders({ orderIdxs: orders
-                .filter(o => +o.filled_amount)
-                .map(o => o.idx)}
-        )
+        const withdrawOrdersIndexes = orders
+            .filter(o => +o.filled_amount)
+            .map(o => o.idx);
+        return client.withdrawOrders({ orderIdxs: withdrawOrdersIndexes})
     }
 };
 

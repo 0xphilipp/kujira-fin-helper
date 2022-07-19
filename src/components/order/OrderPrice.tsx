@@ -1,11 +1,12 @@
 import {InputNumber} from "antd";
 import {toSymbol} from "@util/kujira";
+import useContract from "@hooks/useContract";
 
 interface OrderPriceProps {
     order: Order;
-    contract: Contract;
 }
-const OrderPrice = ({order, contract}: OrderPriceProps) => {
+const OrderPrice = ({order}: OrderPriceProps) => {
+    const {contract} = useContract();
     let price = +order.quote_price;
     let precision = 4;
     return <InputNumber
@@ -14,7 +15,7 @@ const OrderPrice = ({order, contract}: OrderPriceProps) => {
         bordered={false}
         readOnly
         precision={precision}
-        addonAfter={toSymbol(contract.denoms.quote)}
+        addonAfter={contract ? toSymbol(contract.denoms.quote) : undefined}
     />;
 }
 

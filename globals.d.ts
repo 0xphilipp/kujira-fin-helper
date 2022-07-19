@@ -5,6 +5,9 @@ import {DirectSecp256k1HdWallet} from "@cosmjs/proto-signing";
 import {OrderResponse} from "kujira.js/lib/cjs/fin";
 
 declare global {
+    interface SWRKey {
+        [name: string]: string
+    }
     type Denom = 'ukuji'
         | 'factory/kujira1ltvwg69sw3c5z99c6rr08hal7v0kdzfxz07yj5/demo'
         | 'ibc/1B38805B1C75352B28169284F96DF56BDEBD9E8FAC005BDCC8CF0378C82AA8E7'

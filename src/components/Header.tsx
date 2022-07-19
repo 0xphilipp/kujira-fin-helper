@@ -1,17 +1,16 @@
 import React from 'react';
 import {Button, Col, Row} from "antd";
+import useWallet from "@hooks/useWallet";
 
 interface HeaderProps {
-    wallet: Wallet | undefined;
-    onDisconnect: Function;
-    onConnect: Function;
 }
 
 const styleHeaderCol = {
     fontSize: 15,
 }
 
-const Header = ({wallet, onDisconnect, onConnect}: HeaderProps) => {
+const Header = ({}: HeaderProps) => {
+    const {wallet, connect, disconnect} = useWallet();
     return (
         <Row justify={"space-between"} className={'header'} align={'middle'}>
             <Col>
@@ -27,17 +26,14 @@ const Header = ({wallet, onDisconnect, onConnect}: HeaderProps) => {
                             {wallet.account.address}
                         </Col>
                         <Col>
-                            <Button onClick={() => onDisconnect()}>Disconnect Wallet</Button>
+                            <Button onClick={() => disconnect()}>Disconnect Wallet</Button>
                         </Col>
                     </Row>
                 }
                 {!wallet &&
                 <Row gutter={8}>
-                    {/*<Col>
-                        <Button onClick={() => onConnect('harpoon-4')}>connect harpoon-4</Button>
-                    </Col>*/}
                     <Col>
-                        <Button onClick={() => onConnect('kaiyo-1')}>connect kaiyo-1</Button>
+                        <Button onClick={() => connect('kaiyo-1')}>connect kaiyo-1</Button>
                     </Col>
                 </Row>}
             </Col>

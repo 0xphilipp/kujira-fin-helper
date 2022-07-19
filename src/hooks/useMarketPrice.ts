@@ -1,12 +1,15 @@
 import useSWR from "swr";
 import kujira, {toSymbol} from "@util/kujira";
 import {useMemo} from "react";
+import useContract from "./useContract";
 
-const useMarketPrice = (wallet: Wallet | undefined, contract: Contract) => {
+const useMarketPrice = (wallet: Wallet | undefined) => {
 
-    const {data = {base: [], quote: []}} = useSWR(wallet ? ['/price', contract] : null,
-        () => wallet ? kujira.books(wallet, contract, {limit: 1}) : null,
-        { refreshInterval: 2500 }
+    const {contract} = useContract();
+
+    const {data = {base: [], quote: []}} = useSWR(wallet && contract ? `/price/${contract}` : null,
+        () => wallet && contract ? kujira.books(wallet, contract, {limit: 1}) : undefined,
+        { refreshInterval: 2500, revalidateOnFocus: false }
     );
 
     const defaultReturn = useMemo(() => ({
@@ -16,7 +19,7 @@ const useMarketPrice = (wallet: Wallet | undefined, contract: Contract) => {
         quoteSymbol: '',
     }), []);
 
-    if (!data || data.base.length === 0 || data.quote.length === 0) {
+    if (!contract || !data || data.base.length === 0 || data.quote.length === 0) {
         return defaultReturn
     }
 
