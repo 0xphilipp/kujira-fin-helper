@@ -50,6 +50,7 @@ const Markets = ({onPriceClicked}: MarketsProps) => {
 
     if (!wallet || !contract) return <div style={{height: '42px'}}/>;
 
+    console.log(filteredContracts);
     return (
         <>
             <Row align={'middle'} gutter={16}>
@@ -62,12 +63,12 @@ const Markets = ({onPriceClicked}: MarketsProps) => {
                     </Select>
                 </Col>
                 <Col>
-                    <Select value={contract.address} onChange={c => setContract(c as any)}
+                    <Select value={contract.address} onChange={c => setContract(filteredContracts.filter(c2 => c2.address === c)[0])}
                             style={{width: '160px', textAlign: 'right'}}>
                         {wallet && filteredContracts.map(c => (
                             <Select.Option
                                 key={c.address}
-                                value={c}
+                                value={c.address}
                                 style={{textAlign: 'right'}}
                             >{toSymbol(c.denoms.base)} / {toSymbol(c.denoms.quote)}</Select.Option>
                         ))}
