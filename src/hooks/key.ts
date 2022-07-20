@@ -4,6 +4,8 @@ const KEY: SWRKey = {
     ORDERS: '/orders',
     CONTRACT: '/contract',
     WALLET: '/wallet',
+    PENDING_ORDERS: '/pendingOrders',
+    ORDER_REQUEST_PRICE: '/orderRequestPrice',
 }
 
 export default KEY;

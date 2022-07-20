@@ -16,6 +16,7 @@ const useBalances = () => {
     );
     return {
         balances,
+        getBalanceAmount: (denom: string) => balances && balances.filter(b => b.denom === denom)[0]?.amount || 0,
         refreshBalances: () => mutate()
     };
 }

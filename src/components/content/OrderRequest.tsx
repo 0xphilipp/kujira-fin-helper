@@ -5,19 +5,19 @@ import {toSymbol} from "@util/kujira";
 import useWallet from "@hooks/useWallet";
 import useBalances from "@hooks/useBalances";
 import useContract from "@hooks/useContract";
+import useOrderRequest from "@hooks/useOrderRequest";
+import {handleErrorNotification} from "@util/utils";
 
-interface OrderRequestProps {
-    addOrders: (orders: OrderRequest[]) => Promise<void>;
-    changePrice: number;
-}
+interface OrderRequestProps {}
 
-const OrderRequest = ({addOrders, changePrice}: OrderRequestProps) => {
+const OrderRequest = ({}: OrderRequestProps) => {
     const {contract} = useContract();
     const {wallet} = useWallet();
     const {balances} = useBalances();
     const [form] = Form.useForm();
     const [formOption] = Form.useForm();
     const [simulationState, changeSimulationState] = useState({});
+    const {addOrders, price} = useOrderRequest();
     const {base, quote, baseSymbol, quoteSymbol} = contract ? {
         base: contract.denoms.base,
         quote: contract.denoms.quote,
@@ -41,18 +41,20 @@ const OrderRequest = ({addOrders, changePrice}: OrderRequestProps) => {
         setSimulationOrders([]);
     }, [multiple])
     useEffect(() => {
-        if (!changePrice) return;
-        form.setFieldsValue({ price: changePrice });
-    }, [changePrice])
+        form.setFieldsValue({price});
+    }, [price]);
     const onOrder = async () => {
         if (!wallet || !contract || !base) return;
         const values: OrderRequest = await form.validateFields()
         if (multiple) {
-            await addOrders(simulationOrders.map(o => ({
-                ...o,
-                contract: contract,
+            addOrders(simulationOrders.map(o => ({
                 uuid: uuidv4(),
-            })));
+                contract: contract,
+                side: o.side,
+                price: o.price,
+                amount: o.amount
+            })))
+                .catch(handleErrorNotification);
         } else {
             values.contract = contract;
             values.side = tab;
@@ -61,7 +63,6 @@ const OrderRequest = ({addOrders, changePrice}: OrderRequestProps) => {
             values.amount = +values.amount;
             await addOrders([values]);
         }
-        form.resetFields();
     }
     const [simulationOrders, setSimulationOrders] = useState<OrderRequestSimulation[]>([]);
     useEffect(() => {
@@ -101,7 +102,7 @@ const OrderRequest = ({addOrders, changePrice}: OrderRequestProps) => {
                         form={form}
                         colon={false}
                     >
-                        <Form.Item name={'price'} initialValue={0}>
+                        <Form.Item name={'price'} initialValue={price}>
                             <InputNumber
                                 addonBefore={<div style={{width: 50}}>Price</div>}
                                 min={0}

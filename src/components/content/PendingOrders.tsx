@@ -1,24 +1,36 @@
-import {Button, Col, Row, Table} from "antd";
+import {Button, Col, Row, Table, Typography} from "antd";
 import {toSymbol} from "@util/kujira";
 import OrderRequestAmount from "../order/OrderRequestAmount";
 import OrderRequestPrice from "../order/OrderRequestPrice";
+import useOrderRequest from "@hooks/useOrderRequest";
+import useContract from "@hooks/useContract";
+import useBalances from "@hooks/useBalances";
+import {useMemo} from "react";
 
 interface PendingOrdersProps {
-    pendingOrders: OrderRequest[];
-    onCancel: (uuid: string) => void;
-    onOrderSubmit: Function;
 }
-const PendingOrders = ({onOrderSubmit, onCancel, pendingOrders}: PendingOrdersProps) => {
+const PendingOrders = ({}: PendingOrdersProps) => {
+    const {baseSymbol, quoteSymbol, base, quote} = useContract();
+    const {getBalanceAmount} = useBalances();
+    const {orders, postOrder, cancelOrder, totalRequiredAmount} = useOrderRequest();
+    const overBuyAmount = useMemo(() => baseSymbol && base ? totalRequiredAmount[baseSymbol] > getBalanceAmount(base): false, [totalRequiredAmount]);
+    const overSellAmount = useMemo(() => baseSymbol && quote ? totalRequiredAmount[baseSymbol] > getBalanceAmount(quote): false, [totalRequiredAmount]);
     return (
         <div>
-            <Row justify={"space-between"}>
+            <Row justify={"space-between"} align={'middle'}>
                 <Col>
-                    <h2>Pending ({pendingOrders.length})</h2>
+                    <h2>Pending ({orders.length})</h2>
+                    {baseSymbol && quoteSymbol &&
+                        <h4>
+                            <span>Orders Require</span>&nbsp;
+                            <Typography.Text type={overBuyAmount ? 'danger' : undefined}>{totalRequiredAmount[baseSymbol]} {baseSymbol}</Typography.Text>&nbsp;
+                            <Typography.Text type={overSellAmount ? 'danger' : undefined}>{totalRequiredAmount[quoteSymbol]} {quoteSymbol}</Typography.Text>
+                        </h4>}
                 </Col>
                 <Col>
                     <Button
-                        type={pendingOrders.length > 0 ? 'primary' : 'default'}
-                        onClick={() => pendingOrders.length > 0 && onOrderSubmit()}
+                        type={orders.length > 0 ? 'primary' : 'default'}
+                        onClick={() => orders.length > 0 && postOrder()}
                     >
                         Submit
                     </Button>
@@ -28,6 +40,7 @@ const PendingOrders = ({onOrderSubmit, onCancel, pendingOrders}: PendingOrdersPr
                 rowKey={'uuid'}
                 scroll={{y: 500 }}
                 pagination={false}
+                size={'small'}
                 columns={[
                     {
                         title: 'Side',
@@ -58,11 +71,11 @@ const PendingOrders = ({onOrderSubmit, onCancel, pendingOrders}: PendingOrdersPr
                     }, {
                         align: 'right',
                         render(row: OrderRequest) {
-                            return <Button type={'primary'} onClick={() => onCancel(row.uuid)}>X</Button>
+                            return <Button type={'primary'} onClick={() => cancelOrder(row.uuid)}>X</Button>
                         }
                     }
                 ]}
-                dataSource={pendingOrders}
+                dataSource={orders}
             />
         </div>
     )

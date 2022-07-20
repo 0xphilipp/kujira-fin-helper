@@ -73,6 +73,7 @@ const Orders = ({}: OrdersProps) => {
             </Row>
             <Table
                 rowKey={'idx'}
+                size={'small'}
                 rowSelection={{
                     type: 'checkbox',
                     onChange: (_, keys) => setSelectedOrders(keys),
