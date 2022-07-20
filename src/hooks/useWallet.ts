@@ -20,6 +20,7 @@ const useWallet = () => {
     return {
         wallet,
         disconnect: async () => {
+            setContract(undefined);
             return setChainId(undefined);
         },
         connect: async (newChainId: string) => {

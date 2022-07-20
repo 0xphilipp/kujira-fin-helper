@@ -16,8 +16,10 @@ const OrderRequest = ({}: OrderRequestProps) => {
     const {balances} = useBalances();
     const [form] = Form.useForm();
     const [formOption] = Form.useForm();
-    const [simulationState, changeSimulationState] = useState({});
-    const {addOrders, price} = useOrderRequest();
+    const [amount, setAmount] = useState(0);
+    const [step, setStep] = useState(1);
+    const [orders, setOrders] = useState(1);
+    const {addOrders, price, changePrice} = useOrderRequest();
     const {base, quote, baseSymbol, quoteSymbol} = contract ? {
         base: contract.denoms.base,
         quote: contract.denoms.quote,
@@ -33,13 +35,6 @@ const OrderRequest = ({}: OrderRequestProps) => {
         ]
     }, [balances, contract, base, quote]);
     const [tab, setTab] = useState<OrderSide>('Buy');
-    useEffect(() => {
-        formOption.setFieldsValue({
-            step: multiple ? 1 : undefined,
-            orders: multiple ? 1 : undefined,
-        });
-        setSimulationOrders([]);
-    }, [multiple])
     useEffect(() => {
         form.setFieldsValue({price});
     }, [price]);
@@ -67,31 +62,26 @@ const OrderRequest = ({}: OrderRequestProps) => {
     const [simulationOrders, setSimulationOrders] = useState<OrderRequestSimulation[]>([]);
     useEffect(() => {
         if (!contract) return;
-        const price = form.getFieldValue('price');
-        const amount = form.getFieldValue('amount');
         if (!multiple || price === 0) {
-            setSimulationOrders([]);
+            if (simulationOrders.length !== 0 ) setSimulationOrders([]);
             return;
         }
-        formOption.validateFields().then(({step, orders}) => {
-            const simulations: OrderRequestSimulation[] = [{price, amount, side: tab}];
-            let prevPrice = price;
-            for (let i = 1; i < orders; i++) {
-                prevPrice += prevPrice * step / 100 * (tab === 'Buy' ? -1 : 1);
-                simulations.push({
-                    price: prevPrice.toFixed(contract.price_precision.decimal_places),
-                    amount: amount || 0,
-                    side: tab
-                });
-            }
-            setSimulationOrders(simulations);
-        })
-    }, [simulationState])
+        const simulations: OrderRequestSimulation[] = [{price, amount, side: tab}];
+        let prevPrice = price;
+        for (let i = 1; i < orders; i++) {
+            prevPrice += prevPrice * step / 100 * (tab === 'Buy' ? -1 : 1);
+            simulations.push({
+                price: +prevPrice.toFixed(contract.price_precision.decimal_places),
+                amount: amount || 0,
+                side: tab
+            });
+        }
+        setSimulationOrders(simulations);
+    }, [wallet, multiple, price, amount, tab, orders, step])
     return (
         <div>
             <Tabs activeKey={tab} onChange={t => {
                 setTab(t as any);
-                changeSimulationState({});
             }}>
                 <Tabs.TabPane tab={'Buy'} key={'Buy'}/>
                 <Tabs.TabPane tab={'Sell'} key={'Sell'}/>
@@ -109,7 +99,7 @@ const OrderRequest = ({}: OrderRequestProps) => {
                                 style={{width: '100%'}}
                                 addonAfter={<div style={{width: 55}}>{quoteSymbol}</div>}
                                 controls={false}
-                                onChange={() => changeSimulationState({})}
+                                onChange={price => changePrice(price)}
                                 step={10 ** (-1 * (contract?.price_precision.decimal_places || 3))}
                             />
                         </Form.Item>
@@ -128,7 +118,7 @@ const OrderRequest = ({}: OrderRequestProps) => {
                                 style={{width: '100%'}}
                                 addonAfter={<div style={{width: 55}}>{tab === 'Buy' ? quoteSymbol : baseSymbol}</div>}
                                 controls={false}
-                                onChange={() => changeSimulationState({})}
+                                onChange={value => setAmount(value)}
                             />
                         </Form.Item>
                     </Form>
@@ -154,26 +144,28 @@ const OrderRequest = ({}: OrderRequestProps) => {
                                 label={'Price Step'}
                                 name={'step'}
                                 style={{width: 170}}
+                                initialValue={step}
                             >
                                 <InputNumber
                                     className={'input-number-no-handler'}
                                     addonAfter={'%'}
                                     min={0.1} max={10} step={0.1}
                                     disabled={!multiple}
-                                    onChange={() => changeSimulationState({})}
+                                    onChange={step => setStep(step)}
                                 />
                             </Form.Item>
                             <Form.Item
                                 label={'Total'}
                                 name={'orders'}
                                 style={{width: 160}}
+                                initialValue={orders}
                             >
                                 <InputNumber
                                     className={'input-number-no-handler'}
                                     addonAfter={'Orders'}
                                     min={1} max={50} step={1}
                                     disabled={!multiple}
-                                    onChange={() => changeSimulationState({})}
+                                    onChange={orders => setOrders(orders)}
                                 />
                             </Form.Item>
                         </Form>

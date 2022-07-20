@@ -57,7 +57,7 @@ const Orders = ({}: OrdersProps) => {
                                 type={filledOrdersLength ? 'primary' : 'default'}
                                 onClick={() => filledOrdersLength && onWithdrawClicked()}
                             >
-                                Claim All
+                                Claim All ({filledOrdersLength})
                             </Button>
                         </Col>
                         <Col>
