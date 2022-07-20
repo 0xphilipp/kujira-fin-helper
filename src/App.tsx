@@ -21,15 +21,13 @@ const App = () => {
             </Row>
 
             <Row>
-                <Col className={'panel'} flex={'1 250px'}>
+                <Col className={'panel'} flex={'1'}>
                     <Balances />
                 </Col>
-                <Col className={'panel'} flex={'1 400px'}>
+                <Col className={'panel'} flex={'1 350px'}>
                     <OrderRequest />
                 </Col>
-            </Row>
-            <Row>
-                <Col className={'panel'} flex={1}>
+                <Col className={'panel'} flex={'1 400px'}>
                     <PendingOrders />
                 </Col>
             </Row>

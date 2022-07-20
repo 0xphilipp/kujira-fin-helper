@@ -48,6 +48,10 @@ const useOrderRequest = () => {
             mutate([...orders.filter(o => o.uuid !== uuid)]);
         },
         totalRequiredAmount,
+        clearAll() {
+            if (orders.length === 0) return;
+            mutate([]);
+        },
     }
 }
 

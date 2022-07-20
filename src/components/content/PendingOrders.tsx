@@ -12,7 +12,7 @@ interface PendingOrdersProps {
 const PendingOrders = ({}: PendingOrdersProps) => {
     const {baseSymbol, quoteSymbol, base, quote} = useContract();
     const {getBalanceAmount} = useBalances();
-    const {orders, postOrder, cancelOrder, totalRequiredAmount} = useOrderRequest();
+    const {orders, postOrder, cancelOrder, totalRequiredAmount, clearAll} = useOrderRequest();
     const overBuyAmount = useMemo(() => baseSymbol && base ? totalRequiredAmount[baseSymbol] > getBalanceAmount(base): false, [totalRequiredAmount]);
     const overSellAmount = useMemo(() => baseSymbol && quote ? totalRequiredAmount[baseSymbol] > getBalanceAmount(quote): false, [totalRequiredAmount]);
     return (
@@ -28,12 +28,21 @@ const PendingOrders = ({}: PendingOrdersProps) => {
                         </h4>}
                 </Col>
                 <Col>
-                    <Button
-                        type={orders.length > 0 ? 'primary' : 'default'}
-                        onClick={() => orders.length > 0 && postOrder()}
-                    >
-                        Submit
-                    </Button>
+                    <Row justify={'end'} gutter={8}>
+                        <Col>
+                            <Button
+                                type={orders.length > 0 ? 'primary' : 'default'}
+                                onClick={() => clearAll()}>Clear All</Button>
+                        </Col>
+                        <Col>
+                            <Button
+                                type={orders.length > 0 ? 'primary' : 'default'}
+                                onClick={() => orders.length > 0 && postOrder()}
+                            >
+                                Submit
+                            </Button>
+                        </Col>
+                    </Row>
                 </Col>
             </Row>
             <Table

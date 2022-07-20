@@ -20,6 +20,7 @@ const OrderRequest = ({}: OrderRequestProps) => {
     const {addOrders, price, changePrice} = useOrderRequest();
     const [amountOption, setAmountOption] = useState('amount');
     const [multiple, setMultiple] = useState(false);
+    const decimal = useMemo(() => contract ? contract.price_precision.decimal_places : 3, [contract]);
     const bals = useMemo(() => {
         if (!balances) return [0, 0];
         return [
@@ -175,7 +176,7 @@ const OrderRequest = ({}: OrderRequestProps) => {
                         {simulationOrders.length > 0 &&
                             <Descriptions style={{overflow: 'scroll'}}>
                                 <Descriptions.Item>
-                                    {simulationOrders.map(o => `${o.price}(${o.amount}${quoteSymbol})`).join(', ')}
+                                    {simulationOrders.map(o => `${o.price}(${o.amount.toFixed(decimal)}${quoteSymbol})`).join(', ')}
                                 </Descriptions.Item>
                             </Descriptions>
                         }
