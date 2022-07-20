@@ -50,7 +50,6 @@ const Markets = ({onPriceClicked}: MarketsProps) => {
 
     if (!wallet || !contract) return <div style={{height: '42px'}}/>;
 
-    console.log(filteredContracts);
     return (
         <>
             <Row align={'middle'} gutter={16}>
