@@ -14,7 +14,6 @@ const OrderRequest = ({}: OrderRequestProps) => {
     const {wallet} = useWallet();
     const {balances} = useBalances();
     const [form] = Form.useForm();
-    const [formOption] = Form.useForm();
     const [amount, setAmount] = useState(0);
     const [step, setStep] = useState(1);
     const [orders, setOrders] = useState(1);
@@ -139,7 +138,7 @@ const OrderRequest = ({}: OrderRequestProps) => {
                 </Col>
                 <Col span={24}>
                     <Card bodyStyle={{padding: 8}}>
-                        <Form layout={'inline'} form={formOption}>
+                        <Form layout={'inline'}>
                             <Form.Item label={'Multiple'}>
                                 <Checkbox checked={multiple} onChange={() => setMultiple(!multiple)}/>
                             </Form.Item>
