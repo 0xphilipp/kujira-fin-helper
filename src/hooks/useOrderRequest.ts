@@ -6,10 +6,12 @@ import useContract from "@hooks/useContract";
 import kujira from "@util/kujira";
 import useBalances from "@hooks/useBalances";
 import {useMemo} from "react";
+import useOrders from "@hooks/useOrders";
 
 const useOrderRequest = () => {
     const {wallet} = useWallet();
     const {refreshBalances} = useBalances();
+    const {refreshOrders} = useOrders();
     const {contract, baseSymbol, quoteSymbol} = useContract();
     const {data: price = 0, mutate: mutatePrice} = useSWR<number>(
         KEY.ORDER_REQUEST_PRICE,
@@ -39,10 +41,9 @@ const useOrderRequest = () => {
         },
         async postOrder() {
             if (!wallet || orders.length === 0) return;
-            kujira.orders(wallet, orders)
-                .then(() => mutate([]))
-                .then(() => refreshBalances())
-                .catch(handleErrorNotification);
+            return kujira.orders(wallet, orders)
+                .then(() => Promise.all([mutate([]), refreshBalances(), refreshOrders()]))
+                .catch(handleErrorNotification)
         },
         cancelOrder(uuid: string) {
             mutate([...orders.filter(o => o.uuid !== uuid)]);

@@ -24,10 +24,10 @@ const App = () => {
                 <Col className={'panel'} flex={'1'}>
                     <Balances />
                 </Col>
-                <Col className={'panel'} flex={'1 350px'}>
+                <Col className={'panel'} flex={'2 350px'}>
                     <OrderRequest />
                 </Col>
-                <Col className={'panel'} flex={'1 400px'}>
+                <Col className={'panel'} flex={'2 400px'}>
                     <PendingOrders />
                 </Col>
             </Row>
