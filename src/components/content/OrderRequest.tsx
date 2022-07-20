@@ -1,7 +1,6 @@
-import {Button, Card, Checkbox, Col, Descriptions, Form, InputNumber, Row, Tabs} from "antd";
+import {Button, Card, Checkbox, Col, Descriptions, Divider, Form, InputNumber, Row, Select, Tabs} from "antd";
 import {useEffect, useMemo, useState} from "react";
 import {v4 as uuidv4} from 'uuid';
-import {toSymbol} from "@util/kujira";
 import useWallet from "@hooks/useWallet";
 import useBalances from "@hooks/useBalances";
 import useContract from "@hooks/useContract";
@@ -11,7 +10,7 @@ import {handleErrorNotification} from "@util/utils";
 interface OrderRequestProps {}
 
 const OrderRequest = ({}: OrderRequestProps) => {
-    const {contract} = useContract();
+    const {contract, baseSymbol, quoteSymbol, base, quote} = useContract();
     const {wallet} = useWallet();
     const {balances} = useBalances();
     const [form] = Form.useForm();
@@ -20,12 +19,7 @@ const OrderRequest = ({}: OrderRequestProps) => {
     const [step, setStep] = useState(1);
     const [orders, setOrders] = useState(1);
     const {addOrders, price, changePrice} = useOrderRequest();
-    const {base, quote, baseSymbol, quoteSymbol} = contract ? {
-        base: contract.denoms.base,
-        quote: contract.denoms.quote,
-        baseSymbol: toSymbol(contract.denoms.base),
-        quoteSymbol: toSymbol(contract.denoms.quote),
-    } : {baseSymbol: undefined, quoteSymbol: undefined, base: undefined, quote: undefined};
+    const [amountOption, setAmountOption] = useState('amount');
     const [multiple, setMultiple] = useState(false);
     const bals = useMemo(() => {
         if (!balances) return [0, 0];
@@ -54,8 +48,7 @@ const OrderRequest = ({}: OrderRequestProps) => {
             values.contract = contract;
             values.side = tab;
             values.uuid = uuidv4();
-            values.price = +values.price;
-            values.amount = +values.amount;
+            values.amount = amountOption === 'amount' ? values.amount : values.amount * values.price;
             await addOrders([values]);
         }
     }
@@ -66,18 +59,18 @@ const OrderRequest = ({}: OrderRequestProps) => {
             if (simulationOrders.length !== 0 ) setSimulationOrders([]);
             return;
         }
-        const simulations: OrderRequestSimulation[] = [{price, amount, side: tab}];
+        const simulations: OrderRequestSimulation[] = [{price, amount: amountOption === 'amount' ? amount : amount * price, side: tab}];
         let prevPrice = price;
         for (let i = 1; i < orders; i++) {
             prevPrice += prevPrice * step / 100 * (tab === 'Buy' ? -1 : 1);
             simulations.push({
                 price: +prevPrice.toFixed(contract.price_precision.decimal_places),
-                amount: amount || 0,
+                amount: amountOption === 'amount' ? amount : amount * price,
                 side: tab
             });
         }
         setSimulationOrders(simulations);
-    }, [wallet, multiple, price, amount, tab, orders, step])
+    }, [wallet, multiple, price, amount, tab, orders, step, amountOption])
     return (
         <div>
             <Tabs activeKey={tab} onChange={t => {
@@ -113,10 +106,20 @@ const OrderRequest = ({}: OrderRequestProps) => {
                                    ]}
                         >
                             <InputNumber
-                                addonBefore={<div style={{width: 50}}>Amount</div>}
+                                addonBefore={<Select style={{width: 110}} value={amountOption} onChange={o => setAmountOption(o)}>
+                                    <Select.Option value={'amount'}>Amount</Select.Option>
+                                    <Select.Option value={'estm'}>Estimated</Select.Option>
+                                </Select>}
                                 min={0}
                                 style={{width: '100%'}}
-                                addonAfter={<div style={{width: 55}}>{tab === 'Buy' ? quoteSymbol : baseSymbol}</div>}
+                                addonAfter={(
+                                    <div style={{width: 55}}>
+                                        {tab === 'Buy'
+                                            ? (amountOption === 'amount' ? quoteSymbol : baseSymbol)
+                                            : (amountOption === 'amount' ? baseSymbol : quoteSymbol)
+                                        }
+                                    </div>
+                                )}
                                 controls={false}
                                 onChange={value => setAmount(value)}
                             />
@@ -169,13 +172,14 @@ const OrderRequest = ({}: OrderRequestProps) => {
                                 />
                             </Form.Item>
                         </Form>
-                        {simulationOrders.length > 0 && <Card bodyStyle={{padding: 4, overflow: 'scroll'}}>
-                            <Descriptions>
+                        <Divider style={{margin: 10}} />
+                        {simulationOrders.length > 0 &&
+                            <Descriptions style={{overflow: 'scroll'}}>
                                 <Descriptions.Item>
-                                    {simulationOrders.map(o => `${o.price}(${o.amount})`).join(', ')}
+                                    {simulationOrders.map(o => `${o.price}(${o.amount}${quoteSymbol})`).join(', ')}
                                 </Descriptions.Item>
                             </Descriptions>
-                        </Card>}
+                        }
                     </Card>
                 </Col>
                 <Col span={24}>
