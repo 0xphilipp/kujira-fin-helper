@@ -8,10 +8,8 @@ import Markets from "./components/Markets";
 import Balances from "./components/content/Balances";
 import PendingOrders from "./components/content/PendingOrders";
 import Orders from "./components/content/Orders";
-import useOrderHistory from "@hooks/useOrderHistory";
 
 const App = () => {
-    const {history} = useOrderHistory();
     return (
         <div className={'body'}>
             <MetaHead/>
