@@ -59,13 +59,17 @@ const OrderRequest = ({}: OrderRequestProps) => {
             if (simulationOrders.length !== 0 ) setSimulationOrders([]);
             return;
         }
-        const simulations: OrderRequestSimulation[] = [{price, amount: amountOption === 'amount' ? amount : amount * price, side: tab}];
         let prevPrice = price;
+        const getAmount = (amount: number, price: number, decimal: number) => {
+            amount = amount || 0
+            return +(amountOption === 'amount' ? amount : amount * price).toFixed(decimal)
+        };
+        const simulations: OrderRequestSimulation[] = [{price, amount: getAmount(amount, price, decimal), side: tab}];
         for (let i = 1; i < orders; i++) {
             prevPrice += prevPrice * step / 100 * (tab === 'Buy' ? -1 : 1);
             simulations.push({
                 price: +prevPrice.toFixed(contract.price_precision.decimal_places),
-                amount: amountOption === 'amount' ? amount : amount * price,
+                amount: getAmount(amount, prevPrice, decimal),
                 side: tab
             });
         }
@@ -176,7 +180,7 @@ const OrderRequest = ({}: OrderRequestProps) => {
                         {simulationOrders.length > 0 &&
                             <Descriptions style={{overflow: 'scroll'}}>
                                 <Descriptions.Item>
-                                    {simulationOrders.map(o => `${o.price}(${o.amount.toFixed(decimal)}${quoteSymbol})`).join(', ')}
+                                    {simulationOrders.map(o => `${o.price}(${o.amount}${quoteSymbol})`).join(' ')}
                                 </Descriptions.Item>
                             </Descriptions>
                         }
