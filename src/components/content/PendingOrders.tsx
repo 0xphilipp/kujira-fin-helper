@@ -13,8 +13,9 @@ const PendingOrders = ({}: PendingOrdersProps) => {
     const {baseSymbol, quoteSymbol, base, quote} = useContract();
     const {getBalanceAmount} = useBalances();
     const {orders, postOrder, cancelOrder, totalRequiredAmount, clearAll} = useOrderRequest();
-    const overBuyAmount = useMemo(() => baseSymbol && base ? totalRequiredAmount[baseSymbol] > getBalanceAmount(base): false, [totalRequiredAmount]);
-    const overSellAmount = useMemo(() => baseSymbol && quote ? totalRequiredAmount[baseSymbol] > getBalanceAmount(quote): false, [totalRequiredAmount]);
+    const overBuyAmount = useMemo(() => baseSymbol && base ? totalRequiredAmount[baseSymbol] > getBalanceAmount(base): false, [baseSymbol, base, totalRequiredAmount]);
+    const overSellAmount = useMemo(() => quoteSymbol && quote ? totalRequiredAmount[quoteSymbol] > getBalanceAmount(quote): false, [quoteSymbol, quote, totalRequiredAmount]);
+    console.log(quote && getBalanceAmount(quote), totalRequiredAmount)
     return (
         <div>
             <Row justify={"space-between"} align={'middle'}>
