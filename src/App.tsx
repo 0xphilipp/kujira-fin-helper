@@ -21,7 +21,6 @@ const App = () => {
                     <Markets />
                 </Col>
             </Row>
-
             <Row>
                 <Col className={'panel'} flex={'1'}>
                     <Balances />
