@@ -10,7 +10,7 @@ const useWallet = () => {
     const {setContract} = useContract();
     const {chainId, setChainId} = useChainId();
     const {data: wallet} = useSWR<Wallet | undefined>(
-        chainId ? [KEY.WALLET, chainId] : null,
+        [KEY.WALLET, chainId],
         () => chainId
             ? kujira.connectKeplr(chainId)
             : undefined,

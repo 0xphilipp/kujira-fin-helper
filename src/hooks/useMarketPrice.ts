@@ -7,7 +7,8 @@ const useMarketPrice = (wallet: Wallet | undefined) => {
 
     const {contract} = useContract();
 
-    const {data = {base: [], quote: []}} = useSWR(wallet && contract ? `/price/${contract}` : null,
+    const {data = {base: [], quote: []}} = useSWR(
+        [`/price/${contract}`, wallet && contract],
         () => wallet && contract ? kujira.books(wallet, contract, {limit: 1}) : undefined,
         { refreshInterval: 2500, revalidateOnFocus: false }
     );

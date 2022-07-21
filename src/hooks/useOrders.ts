@@ -12,7 +12,8 @@ const useOrders = () => {
     const {wallet} = useWallet();
     const {refreshBalances} = useBalances();
     const isValidState = contract && wallet;
-    const {data: orders = defaultOrders, mutate} = useSWR<Order[] | undefined>(isValidState ? KEY.ORDERS : null,
+    const {data: orders = defaultOrders, mutate} = useSWR<Order[] | undefined>(
+        [KEY.ORDERS, isValidState],
         () => isValidState
             ? kujira.getOrders(wallet, contract)
             : defaultOrders,
