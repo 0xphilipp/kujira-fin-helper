@@ -31,7 +31,7 @@ const useOrderRequest = () => {
                 [baseSymbol]: 0,
                 [quoteSymbol]: 0,
             });
-    }, [orders]);
+    }, [baseSymbol, quoteSymbol, orders]);
     return {
         price, changePrice: (price: number) => mutatePrice(price),
         orders,
