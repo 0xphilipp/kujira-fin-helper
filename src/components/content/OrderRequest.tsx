@@ -180,7 +180,7 @@ const OrderRequest = ({}: OrderRequestProps) => {
                         {simulationOrders.length > 0 &&
                             <Descriptions style={{overflow: 'scroll'}}>
                                 <Descriptions.Item>
-                                    {simulationOrders.map(o => `${o.price}(${o.amount}${quoteSymbol})`).join(' ')}
+                                    {simulationOrders.map(o => `${o.price}(${o.amount}${tab === 'Buy' ? quoteSymbol : baseSymbol})`).join(' ')}
                                 </Descriptions.Item>
                             </Descriptions>
                         }

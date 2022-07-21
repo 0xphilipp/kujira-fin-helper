@@ -23,11 +23,6 @@ const useOrders = () => {
     return {
         orders: orders || [],
         refreshOrders: () => mutate(),
-        postOrders: (pendingOrders: OrderRequest[]) => {
-            if (!wallet) return Promise.reject();
-            return kujira.orders(wallet, pendingOrders)
-                .then(() => mutate())
-        },
         postOrdersWithdraw: async (orders: Order[]) => {
             if (!wallet || !contract) return Promise.reject();
             return kujira.ordersWithdraw(wallet, contract, orders)

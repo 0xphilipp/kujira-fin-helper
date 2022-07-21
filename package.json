@@ -13,6 +13,7 @@
     "@types/react-dom": "^18.0.6",
     "antd": "^4.21.6",
     "buffer": "^6.0.3",
+    "firebase": "^9.9.0",
     "kujira.js": "https://github.com/Team-Kujira/kujira.js.git",
     "module-alias": "^2.2.2",
     "react": "^18.2.0",

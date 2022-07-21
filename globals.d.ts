@@ -66,6 +66,15 @@ declare global {
         price: number;
         amount: number;
     }
+    interface OrderHistory {
+        idx: number;
+        market: string; // contract address
+        action: 'submit_order';
+        offer_amount: string;
+        offer_denom: string
+        order_idx: string;
+        quote_price: string;
+    }
 }
 
 export {};
