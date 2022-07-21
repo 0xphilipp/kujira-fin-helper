@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import KEY from "./key";
 import {toSymbol} from "@util/kujira";
-import {useMemo, useState} from "react";
+import {useMemo} from "react";
 
 const useContract = () => {
     const {data, mutate} = useSWR<Contract | undefined>(

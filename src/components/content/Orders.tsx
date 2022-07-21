@@ -18,7 +18,7 @@ const Orders = ({}: OrdersProps) => {
     const filledOrdersLength = useMemo(() => orders.filter(o => +o.filled_amount > 0).length, [orders]);
     useEffect(() => setSelectedOrders([]), [orders, tab]);
 
-    const counts = useMemo(() => ({
+    const counts = useMemo<{Open: number, Partial: number, Closed: number}>(() => ({
         Open: orders.filter(o => o.state === 'Open').length,
         Partial: orders.filter(o => o.state === 'Partial').length,
         Closed: orders.filter(o => o.state === 'Closed').length,
@@ -44,10 +44,9 @@ const Orders = ({}: OrdersProps) => {
                 <Col>
                     <Tabs defaultActiveKey="All" onChange={tab => setTab(tab)} activeKey={tab}>
                         <Tabs.TabPane tab={`All(${orders.length})`} key="All"/>
-                        {['Open', 'Partial', 'Closed'].map(t => (
-                            /*@ts-ignore*/
-                            <Tabs.TabPane tab={`${t}${orders.length > 0 ? `(${counts[t]})` : ''}`} key={t} />
-                        ))}
+                        <Tabs.TabPane tab={`Open${orders.length > 0 ? `(${counts['Open']})` : ''}`} key={'Open'} />
+                        <Tabs.TabPane tab={`Partial${orders.length > 0 ? `(${counts['Partial']})` : ''}`} key={'Partial'} />
+                        <Tabs.TabPane tab={`Closed${orders.length > 0 ? `(${counts['Closed']})` : ''}`} key={'Closed'} />
                     </Tabs>
                 </Col>
                 <Col>

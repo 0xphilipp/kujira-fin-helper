@@ -12,7 +12,7 @@ const useBalances = () => {
         () => wallet
             ? kujira.getBalances(wallet, contracts)
             : undefined,
-        { revalidateOnFocus: false }
+        { revalidateOnMount: false, revalidateOnFocus: false }
     );
     return {
         balances,

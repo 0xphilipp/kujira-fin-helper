@@ -8,9 +8,9 @@ import useChainId from "./useChainId";
 const useWallet = () => {
     const contracts = useContracts();
     const {setContract} = useContract();
-    const {chainId, setChainId} = useChainId()
+    const {chainId, setChainId} = useChainId();
     const {data: wallet} = useSWR<Wallet | undefined>(
-        [KEY.WALLET, chainId],
+        chainId ? [KEY.WALLET, chainId] : null,
         () => chainId
             ? kujira.connectKeplr(chainId)
             : undefined,

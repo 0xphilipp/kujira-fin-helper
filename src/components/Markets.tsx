@@ -24,7 +24,7 @@ const Markets = ({}: MarketsProps) => {
     const {balances} = useBalances();
     const [market, setMarket] = useState<Market | undefined>(undefined);
     const filteredContracts = useMemo(() => {
-        if (!wallet) return [];
+        if (contracts.length && wallet && market) return;
         return contracts.filter(c => toSymbol(c.denoms.quote) === market);
     }, [contracts, wallet, market]);
     const [bals, setBals] = useState<number[]>([]);
@@ -38,12 +38,12 @@ const Markets = ({}: MarketsProps) => {
         setAverage(+((base + quote) / 2).toFixed(+contract.price_precision.decimal_places))
     }, [balances, market, base, quote, contract])
     useEffect(() => {
-        if (filteredContracts.length === 0) return;
+        if (!filteredContracts) return;
         setContract(filteredContracts[0]);
     }, [market]);
     useEffect(() => {
         setMarket(wallet ? 'axlUSDC' : undefined);
-        if (filteredContracts.length === 0 || !wallet) {
+        if (!filteredContracts || !wallet) {
             return;
         }
         setContract(filteredContracts[0]);
@@ -63,9 +63,9 @@ const Markets = ({}: MarketsProps) => {
                     </Select>
                 </Col>
                 <Col>
-                    <Select value={contract.address} onChange={c => setContract(filteredContracts.filter(c2 => c2.address === c)[0])}
+                    <Select value={contract.address} onChange={c => filteredContracts && setContract(filteredContracts.filter(c2 => c2.address === c)[0])}
                             style={{width: '160px', textAlign: 'right'}}>
-                        {wallet && filteredContracts.map(c => (
+                        {wallet && filteredContracts && filteredContracts.map(c => (
                             <Select.Option
                                 key={c.address}
                                 value={c.address}
