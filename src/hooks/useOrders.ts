@@ -32,7 +32,7 @@ const useOrders = () => {
         },
         postCancelOrder: async (orders: Order[]) => {
             if (!wallet || !contract) return Promise.reject();
-            return kujira.ordersCancel(wallet, contract, orders.map(o => `${o.idx}`))
+            return kujira.ordersCancel(wallet, contract, orders)
                 .then(() => mutate())
         }
     };

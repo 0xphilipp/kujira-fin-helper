@@ -26,7 +26,7 @@ const App = () => {
                 <Col className={'panel'} flex={'2'}>
                     <OrderRequest />
                 </Col>
-                <Col className={'panel'} flex={'2'}>
+                <Col className={'panel'} flex={'3'}>
                     <PendingOrders />
                 </Col>
             </Row>

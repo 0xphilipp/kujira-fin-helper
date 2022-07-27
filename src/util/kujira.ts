@@ -1,12 +1,12 @@
 import {Coin, coins, DeliverTxResponse, GasPrice, MsgSendEncodeObject} from "@cosmjs/stargate";
 import {DirectSecp256k1HdWallet} from "@cosmjs/proto-signing";
+import * as kujiraClient from "kujira.js";
 import {FinClient, registry, tx} from "kujira.js";
 import {BookResponse} from "kujira.js/lib/cjs/fin";
 import {ExecuteResult, SigningCosmWasmClient} from "@cosmjs/cosmwasm-stargate";
 import {MsgSend} from "cosmjs-types/cosmos/bank/v1beta1/tx";
-import {OrderResponse, Uint128} from "kujira.js/src/fin";
+import {OrderResponse} from "kujira.js/src/fin";
 import {Buffer} from 'buffer';
-import * as kujiraClient from "kujira.js";
 
 const toOrder = (contract: Contract, o: OrderResponse): Order => {
     let state: OrderState = 'Open';
@@ -143,21 +143,25 @@ const kujira = {
         if (orders.length === 0) return Promise.reject('orders empty');
         const {client, account} = wallet;
         const msgs = orders.map(o => {
+            const { contract } = o;
+            const { denoms, decimal_delta, price_precision: {decimal_places} } = contract;
             const denom = o.side === 'Buy'
-                ? o.contract.denoms.quote
-                : o.contract.denoms.base;
-            let price = o.contract.decimal_delta
-                ? (o.price /= 10 ** o.contract.decimal_delta).toFixed(o.contract.decimal_delta)
-                : `${o.price}`;
+                ? denoms.quote
+                : denoms.base;
+            let price = decimal_delta
+                ? (o.price /= 10 ** decimal_delta).toFixed(decimal_delta + decimal_places)
+                : o.price.toFixed((decimal_delta || 0) + decimal_places);
             let amount = o.amount * 10 ** 6;
             if (o.side === 'Sell') {
-                amount *= 10 ** (o.contract.decimal_delta || 0);
+                amount *= 10 ** (decimal_delta || 0);
             }
+            const amountString = amount.toFixed(0);
+            console.log(price, amountString);
             const data = {
                 sender: account.address,
-                contract: o.contract.address,
+                contract: contract.address,
                 msg: Buffer.from(JSON.stringify({submit_order: {price}})),
-                funds: coins(amount, denom),
+                funds: coins(amountString, denom),
             };
             return tx.wasm.msgExecuteContract(data);
         });
@@ -171,10 +175,10 @@ const kujira = {
             .then(res => res.json())
             .then(res => res.balances.map((coin: Coin) => ({amount: `${+coin.amount / 10 ** (6 + getDecimalDelta(coin.denom))}`, denom: (coin.denom as Denom)})))
     },
-    async ordersCancel(wallet: Wallet, contract: Contract, ordersIdx: Uint128[]): Promise<ExecuteResult> {
+    async ordersCancel(wallet: Wallet, contract: Contract, orders: Order[]): Promise<ExecuteResult> {
         const {client, account} = wallet;
         const finClient: FinClient = new FinClient(client, account.address, contract.address);
-        return finClient.retractOrders({ orderIdxs: ordersIdx });
+        return finClient.retractOrders({ orderIdxs: orders.map(o => `${o.idx}`) });
     },
     async getOrders(wallet: Wallet, contract: Contract, orders: Order[] = []): Promise<Order[]> {
         const {client, account} = wallet;
