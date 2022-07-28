@@ -20,7 +20,7 @@ const Markets = ({}: MarketsProps) => {
     const {wallet} = useWallet();
     const {contract, setContract} = useContract();
     const {base, quote, baseSymbol, quoteSymbol} = useMarketPrice(wallet);
-    const contracts = useContracts();
+    const {contracts} = useContracts();
     const {balances} = useBalances();
     const [market, setMarket] = useState<Market | undefined>(undefined);
     const filteredContracts = useMemo(() => {

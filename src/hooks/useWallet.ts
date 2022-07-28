@@ -7,7 +7,7 @@ import useChainId from "./useChainId";
 import {useEffect} from "react";
 
 const useWallet = () => {
-    const contracts = useContracts();
+    const {contracts} = useContracts();
     const {setContract} = useContract();
     const {chainId, setChainId} = useChainId();
     const {data: wallet} = useSWR<Wallet | undefined>(

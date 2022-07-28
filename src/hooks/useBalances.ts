@@ -6,7 +6,7 @@ import useContracts from "./useContracts";
 
 const useBalances = () => {
     const {wallet} = useWallet();
-    const contracts = useContracts();
+    const {contracts} = useContracts();
     const {data: balances, mutate} = useSWR<Balance[] | undefined>(
         [KEY.BALANCES, wallet],
         () => wallet

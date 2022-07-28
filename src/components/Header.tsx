@@ -1,6 +1,7 @@
-import React from 'react';
-import {Button, Col, Row} from "antd";
+import React, {useState} from 'react';
+import {Button, Col, Menu, Row} from "antd";
 import useWallet from "@hooks/useWallet";
+import {Link} from "react-router-dom";
 
 interface HeaderProps {
 }
@@ -11,10 +12,31 @@ const styleHeaderCol = {
 
 const Header = ({}: HeaderProps) => {
     const {wallet, connect, disconnect} = useWallet();
+    const [menu, setMenu] = useState('0');
     return (
         <Row justify={"space-between"} className={'header'} align={'middle'}>
             <Col>
-                <h1>KUJIRA FIN Helper</h1>
+                <Row>
+                    <Col>
+                        <h1 style={{margin: 0}}>KUJIRA FIN Helper</h1>
+                    </Col>
+                    <Col>
+                        <Menu
+                            theme="dark"
+                            mode="horizontal"
+                            defaultSelectedKeys={[menu]}
+                            onClick={({key}) => setMenu(key)}
+                            items={[
+                            {
+                                key: `Trading`,
+                                label: <Link to={'/'}>Trading</Link>,
+                            }, {
+                                key: 'Market Making',
+                                label: <Link to={'/market-making'}>Market Making</Link>,
+                            }]}
+                        />
+                    </Col>
+                </Row>
             </Col>
             <Col style={{...styleHeaderCol, textAlign: 'right'}}>
                 {wallet &&
