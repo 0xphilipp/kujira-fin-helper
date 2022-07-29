@@ -5,6 +5,7 @@ import {TradingDto} from "../../trading/trading";
 import useContracts from "@hooks/useContracts";
 import TradingClient from "../../client/trading-client";
 import useServers from "@hooks/useServers";
+import {handleErrorNotification} from "@util/utils";
 
 const MarketMakingDetailPage = () => {
     let { id } = useParams();
@@ -28,13 +29,15 @@ const MarketMakingDetailPage = () => {
                 setContract(getContractByAddress(res.contract.address));
                 setTrading(res);
             })
+            .catch(handleErrorNotification)
     }, []);
     const onModify = async () => {
         const values: TradingDto = await form.validateFields();
         values.targetRate = targetRate;
         values.deltaRates = rates;
         TradingClient.postTrading(hostMarketMaking, values)
-            .then(() => navigate('/market-making'));
+            .then(() => navigate('/market-making'))
+            .catch(handleErrorNotification);
     }
     if (!trading || !targetRate || !trading.balanceRate || !contract) return <div style={{padding: 10}}>Loading...</div>;
     return (

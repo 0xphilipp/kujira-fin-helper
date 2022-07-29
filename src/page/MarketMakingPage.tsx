@@ -7,6 +7,7 @@ import {TradingDto} from "../trading/trading";
 import TradingClient from "../client/trading-client";
 import {useState} from "react";
 import useServers from "@hooks/useServers";
+import {handleErrorNotification} from "@util/utils";
 
 const MarketMakingPage = () => {
     const navigate = useNavigate();
@@ -21,7 +22,8 @@ const MarketMakingPage = () => {
         const {server} = await form.validateFields();
         TradingClient.getInfo(server)
             .then(() => setConnected(true))
-            .then(() => mutate(server));
+            .then(() => mutate(server))
+            .catch(handleErrorNotification);
     }
     return (
         <div style={{padding: 10}}>
@@ -33,7 +35,7 @@ const MarketMakingPage = () => {
                 <Form.Item
                     name={'server'}
                     label={'Connect Server'}
-                    initialValue={'http://localhost:3000'}
+                    initialValue={hostMarketMaking || 'http://localhost:3000'}
                     rules={[{
                         required: true,
                         validator(rule, value) {
