@@ -8,6 +8,7 @@ import TradingClient from "../client/trading-client";
 import {useState} from "react";
 import useServers from "@hooks/useServers";
 import {handleErrorNotification} from "@util/utils";
+import {TradingState} from "../trading/trading-state";
 
 const MarketMakingPage = () => {
     const navigate = useNavigate();
@@ -24,6 +25,16 @@ const MarketMakingPage = () => {
             .then(() => setConnected(true))
             .then(() => mutate(server))
             .catch(handleErrorNotification);
+    }
+    const onStateChange = (row: TradingDto, state: TradingState) => {
+        if (!hostMarketMaking) return;
+        if (state === TradingState.STOP) {
+            TradingClient.patchStop(hostMarketMaking, row.uuid)
+                .catch(handleErrorNotification);
+        } else if (state === TradingState.INITIALIZE) {
+            TradingClient.patchResume(hostMarketMaking, row.uuid)
+                .catch(handleErrorNotification);
+        }
     }
     return (
         <div style={{padding: 10}}>
@@ -95,7 +106,22 @@ const MarketMakingPage = () => {
                             render(row: string[]) {
                                 return <div style={{width: 200}}>{row.map(r => (+r * 100).toFixed(1)).join(',')}</div>
                             },
-                        },
+                        }, {
+                            title: 'Actions',
+                            render: (row) => (
+                                <Button
+                                    style={{width: 80}}
+                                    type={'primary'}
+                                    danger={row.state !== TradingState.STOP}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation()
+                                        onStateChange(row, row.state === TradingState.STOP ? TradingState.INITIALIZE : TradingState.STOP);
+                                    }}>
+                                    {row.state === TradingState.STOP ? 'Resume' : 'Stop'}
+                                </Button>
+                            )
+                        }
                     ]}
                     dataSource={tradings}
                 />

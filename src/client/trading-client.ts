@@ -22,6 +22,16 @@ const TradingClient = ({
         return fetch(`${host}/info`)
             .then(res => res.json());
     },
+    patchStop(host: string, id: string) {
+        return fetch(`${host}/tradings/${id}/stop`, {
+            method: 'post',
+        });
+    },
+    patchResume(host: string, id: string) {
+        return fetch(`${host}/tradings/${id}/resume`, {
+            method: 'post',
+        })
+    }
 })
 
 export default TradingClient;
