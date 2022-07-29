@@ -59,7 +59,7 @@ const MarketMakingDetailPage = () => {
                     <Input disabled value={getMarket(contract)} />
                 </Form.Item>
                 <Form.Item label={'state'} name={'state'}>
-                    <Select>
+                    <Select disabled>
                         <Select.Option value={'INITIALIZE'}>INITIALIZE</Select.Option>
                         <Select.Option value={'ORDER'}>ORDER</Select.Option>
                         <Select.Option disabled value={'ORDER_PREPARED'}>ORDER_PREPARED</Select.Option>
