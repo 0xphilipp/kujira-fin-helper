@@ -36,7 +36,6 @@ const MarketMakingFormPage = () => {
                     setTargetRate(res.targetRate);
                     setContract(getContractByAddress(res.contract.address));
                     form.setFieldsValue(res);
-                    console.log(res);
                 })
                 .catch(handleErrorNotification)
         } else {
