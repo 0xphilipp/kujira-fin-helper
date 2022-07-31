@@ -9,6 +9,13 @@ const TradingServerConnection = () => {
     const onConnectServer = async () => {
         const {server} = await form.validateFields();
         TradingClient.getInfo(server)
+            .then(res => {
+                if (res.version !== process.env.REACT_APP_VERSION) {
+                    const error = new Error();
+                    error.message = `Server version[${res.version}] and Client version[${process.env.VERSION}] mismatch.`;
+                    throw error;
+                }
+            })
             .then(() => mutate(server))
             .catch(handleErrorNotification);
     }
@@ -29,7 +36,7 @@ const TradingServerConnection = () => {
                     }
                 }]}
             >
-                <Input type={'url'} disabled={connected}/>
+                <Input type={'url'} disabled={connected} />
             </Form.Item>
             <Form.Item label={' '}>
                 <Button disabled={connected} onClick={() => onConnectServer()}>Connect</Button>
