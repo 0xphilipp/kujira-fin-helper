@@ -50,6 +50,7 @@ const MarketMakingFormPage = () => {
         }
     }, [rate]);
     const onSave = async () => {
+        if (!host) return;
         const values = await form.validateFields();
         const dto: TradingAddDto = {
             account: values.account,

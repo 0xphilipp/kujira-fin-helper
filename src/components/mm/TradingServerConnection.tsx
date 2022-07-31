@@ -1,13 +1,18 @@
-import {Button, Form, Input} from "antd";
+import {Button, Checkbox, Form, Input, Popover} from "antd";
 import useServers from "@hooks/useServers";
 import TradingClient from "../../client/trading-client";
 import {handleErrorNotification} from "@util/utils";
+import {useEffect} from "react";
 
 const TradingServerConnection = () => {
     const [form] = Form.useForm();
     const {host, mutate, connected} = useServers();
     const onConnectServer = async () => {
-        const {server} = await form.validateFields();
+        if (connected) {
+            await mutate(undefined);
+            return;
+        }
+        const {save, server} = await form.validateFields();
         TradingClient.getInfo(server)
             .then(res => {
                 if (res.version !== process.env.REACT_APP_VERSION) {
@@ -16,9 +21,26 @@ const TradingServerConnection = () => {
                     throw error;
                 }
             })
+            .then(() => {
+                if (save) {
+                    localStorage.setItem('server', server);
+                } else {
+                    localStorage.removeItem('server');
+                }
+            })
             .then(() => mutate(server))
             .catch(handleErrorNotification);
     }
+    useEffect(() => {
+        const url = localStorage.getItem('server');
+        if (url) {
+            form.setFieldsValue({
+                save: 'checked',
+            })
+            mutate(url)
+                .catch(handleErrorNotification);
+        }
+    }, [])
     return (
         <Form form={form}
               style={{marginBottom: 10}}
@@ -38,8 +60,26 @@ const TradingServerConnection = () => {
             >
                 <Input type={'url'} disabled={connected} />
             </Form.Item>
+            <Popover content={'Save on successful connection for next connection'}>
+                <div>
+                    <Form.Item
+                        name={'save'}
+                        valuePropName="checked"
+                    >
+                        <Checkbox disabled={connected} onChange={(e) => {
+                            if (!e.target.checked) {
+                                localStorage.removeItem('server');
+                            }
+                        }}>
+                            Save
+                        </Checkbox>
+                    </Form.Item>
+                </div>
+            </Popover>
             <Form.Item label={' '}>
-                <Button disabled={connected} onClick={() => onConnectServer()}>Connect</Button>
+                <Button onClick={() => onConnectServer()} style={{width: 100}}>
+                    {connected ? 'Disconnect' : 'Connect'}
+                </Button>
             </Form.Item>
         </Form>
     )

@@ -5,11 +5,11 @@ import {useMemo} from "react";
 import useContract from "@hooks/useContract";
 import useMarketPrice from "@hooks/useMarketPrice";
 
-const useWalletBalance = (host: string, wallet: string | null) => {
-    const {contract, base, quote, setContract} = useContract();
+const useWalletBalance = (host: string | undefined, wallet: string | null) => {
+    const {contract, base, quote} = useContract();
     const {price} = useMarketPrice();
     const { data: balances } = useSWR<Balance[] | undefined>([`/wallets/${wallet}/balances`, wallet],
-        () => wallet ? WalletClient.getBalances(host, wallet) : undefined,
+        () => host && wallet ? WalletClient.getBalances(host, wallet) : undefined,
         { revalidateOnMount: false, revalidateOnFocus: false, refreshInterval: 5000 }
     );
 

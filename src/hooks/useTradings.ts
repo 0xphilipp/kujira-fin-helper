@@ -10,10 +10,12 @@ const useTradings = () => {
     );
     return {
         tradings,
-        stop: (uuid: string) => {
+        stop: async (uuid: string) => {
+            if (!host) return Promise.reject();
             return TradingClient.patchStop(host, uuid)
         },
-        resume: (uuid: string) => {
+        resume: async (uuid: string) => {
+            if (!host) return Promise.reject();
             return TradingClient.patchResume(host, uuid)
         }
     }
