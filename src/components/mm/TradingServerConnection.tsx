@@ -36,6 +36,7 @@ const TradingServerConnection = () => {
         if (url) {
             form.setFieldsValue({
                 save: 'checked',
+                server: url,
             })
             mutate(url)
                 .catch(handleErrorNotification);
