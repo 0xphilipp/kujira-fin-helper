@@ -140,7 +140,7 @@ const MarketMakingFormPage = () => {
                 <Form.Item label={'Order Rates'}>
                     <Form.Item>
                         <InputNumber
-                            min={-100} step={0.5}
+                            min={-100} step={0.1}
                             defaultValue={0} max={100} style={{textAlign: 'left'}}
                             addonBefore={'ADD'}
                             addonAfter={'%'}
