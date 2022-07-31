@@ -1,4 +1,4 @@
-import {TradingDto} from "../trading/trading";
+import {TradingAddDto, TradingDto} from "../trading/trading";
 
 const TradingClient = ({
     getTradings(host: any) {
@@ -9,14 +9,24 @@ const TradingClient = ({
         return fetch(`${host}/tradings/${id}`)
             .then(res => res.json())
     },
-    postTrading(host: string, values: TradingDto) {
-        return fetch(`${host}/tradings/${values.uuid}`, {
+    postTrading(host: string, id: string, values: TradingAddDto) {
+        return fetch(`${host}/tradings/${id}`, {
             method: 'post',
             body: JSON.stringify(values),
             headers: {
                 'Content-type': 'application/json'
             }
         })
+            .then(res => res.json())
+    },
+    putTrading(host: string, values: TradingAddDto) {
+        return fetch(`${host}/tradings`, {
+            method: 'put',
+            body: JSON.stringify(values),
+            headers: {
+                'Content-type': 'application/json'
+            }
+        }).then(res => res.json())
     },
     getInfo(host: string) {
         return fetch(`${host}/info`)
@@ -31,7 +41,7 @@ const TradingClient = ({
         return fetch(`${host}/tradings/${id}/resume`, {
             method: 'post',
         })
-    }
+    },
 })
 
 export default TradingClient;

@@ -19,7 +19,7 @@ const Markets = ({}: MarketsProps) => {
     const {changePrice} = useOrderRequest();
     const {wallet} = useWallet();
     const {contract, setContract} = useContract();
-    const {base, quote, baseSymbol, quoteSymbol} = useMarketPrice(wallet);
+    const {base, quote, baseSymbol, quoteSymbol} = useMarketPrice();
     const {contracts} = useContracts();
     const {balances} = useBalances();
     const [market, setMarket] = useState<Market | undefined>(undefined);

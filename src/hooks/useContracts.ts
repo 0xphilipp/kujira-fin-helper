@@ -3,7 +3,7 @@ import {toSymbol} from "@util/kujira";
 import {useCallback, useMemo} from "react";
 
 const useContracts = () => {
-    const contracts = contractJson as Contract[];
+    const contracts = useMemo(() => contractJson as Contract[], []);
     const contractAddressMap = useMemo(() => {
         const map = new Map();
         contracts.forEach(c => map.set(c.address, c));
