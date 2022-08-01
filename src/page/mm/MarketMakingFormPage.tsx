@@ -18,7 +18,7 @@ const MarketMakingFormPage = () => {
     const account = useMemo(() => searchParams.get('account'), [searchParams]);
     const page = useMemo<'Add' | 'Modify'>(() => id ? 'Modify' : 'Add', []);
     const { contract, setContract } = useContract();
-    const [rates, setRates] = useState<number[]>([]);
+    const [rates, setRates] = useState<number[]>(page === 'Add' ? [-0.02, -0.01, 0, 0.01, 0.02] : []);
     const [targetRate, setTargetRate] = useState<number>();
     const {rate} = useWalletBalance(host, account);
     const {contracts, getMarket, getBaseSymbol, getContractByAddress} = useContracts();
@@ -66,6 +66,14 @@ const MarketMakingFormPage = () => {
             .then(() => navigate('/market-making'))
             .catch(handleErrorNotification);
     }
+
+    const onRateInputEnter = (value: number) => {
+        const rate: number = +(value / 100).toFixed(3);
+        if (isNaN(rate)) return;
+        if (rate <= -1 || rate >= 1) return;
+        setRates(rates => rates ? [rate, ...rates?.filter(r => r !== rate)] : [rate])
+    }
+
     return (
         <div style={{padding: 10}}>
             <Form
@@ -138,7 +146,7 @@ const MarketMakingFormPage = () => {
                     />
                 </Form.Item>
                 <Form.Item label={'Order Rates'}>
-                    <Form.Item>
+                    <Form.Item name={'rate'}>
                         <InputNumber
                             min={-100} step={0.1}
                             defaultValue={0} max={100} style={{textAlign: 'left'}}
@@ -147,10 +155,8 @@ const MarketMakingFormPage = () => {
                             precision={1}
                             controls={false}
                             onPressEnter={v => {
-                                const rate: number = +(+v.target.value / 100).toFixed(3);
-                                if (isNaN(rate)) return;
-                                if (rate <= -1 || rate >= 1) return;
-                                setRates(rates => rates ? [rate, ...rates?.filter(r => r !== rate)] : [rate])
+                                const value = +v.target.value;
+                                onRateInputEnter(value);
                             }}
                         />
                     </Form.Item>
