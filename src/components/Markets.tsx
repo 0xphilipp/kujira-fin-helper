@@ -24,7 +24,6 @@ const Markets = ({}: MarketsProps) => {
     const {balances} = useBalances();
     const [market, setMarket] = useState<Market | undefined>(undefined);
     const filteredContracts = useMemo(() => {
-        if (contracts.length && wallet && market) return;
         return contracts.filter(c => toSymbol(c.denoms.quote) === market);
     }, [contracts, wallet, market]);
     const [bals, setBals] = useState<number[]>([]);
