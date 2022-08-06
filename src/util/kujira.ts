@@ -16,8 +16,8 @@ const denoms = new Map();
 
 denomsJson.forEach(d => denoms.set(d.denom, d));
 
-const getDecimalDelta = (contracts: Contract[], denom: string) => contracts.filter(c => c.denoms.base === denom)
-    .map(c => (+c.decimal_delta || 0))[0] || 0;
+const getDecimalDelta = (contracts: Contract[], denom: string) => denomsJson.filter(c => c.denom === denom)
+    .map(c => (+c.decimal || 0))[0] || 0;
 
 const toOrder = (contract: Contract, o: OrderResponse): Order => {
     let state: OrderState = 'Open';
@@ -76,7 +76,7 @@ async function sign(endpoint: string) {
 let account: Wallet | null = null;
 
 export const toSymbol = (denom: Denom) => {
-    return denoms.get(denom).symbol;
+    return denoms.get(denom)?.symbol || denom;
 }
 
 const kujira = {
@@ -166,7 +166,7 @@ const kujira = {
     async getBalancesByAddress(address: string): Promise<Balance[]> {
         return fetch(`https://lcd.kaiyo.kujira.setten.io/cosmos/bank/v1beta1/balances/${address}`)
             .then(res => res.json())
-            .then(res => res.balances.map((coin: Coin) => ({amount: `${+coin.amount / 10 ** (6 + getDecimalDelta(contracts, coin.denom))}`, denom: (coin.denom as Denom)})))
+            .then(res => res.balances.map((coin: Coin) => ({amount: `${+coin.amount / 10 ** getDecimalDelta(contracts, coin.denom)}`, denom: (coin.denom as Denom)})))
     },
     async getBalances(wallet: Wallet): Promise<Balance[]> {
         return this.getBalancesByAddress(wallet.account.address);

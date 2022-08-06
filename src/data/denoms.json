@@ -43,5 +43,10 @@
     "denom": "ukuji",
     "symbol": "KUJI",
     "decimal": 6
+  },
+  {
+    "denom": "ibc/004EBF085BBED1029326D56BE8A2E67C08CECE670A94AC1947DF413EF5130EB2",
+    "symbol": "wAVAX",
+    "decimal": 6
   }
 ]
