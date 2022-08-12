@@ -5,7 +5,7 @@ import {TradingDto} from "../trading/trading";
 
 const useTradings = () => {
     const {host, connected} = useServers();
-    const {data: tradings} = useSWR<TradingDto[]>(['/tradings', connected], () => connected ? TradingClient.getTradings(host) : [],
+    const {data: tradings, mutate} = useSWR<TradingDto[]>(['/tradings', connected], () => connected ? TradingClient.getTradings(host) : [],
         { refreshInterval: 5_000, revalidateOnFocus: false, }
     );
     return {
@@ -17,7 +17,12 @@ const useTradings = () => {
         resume: async (uuid: string) => {
             if (!host) return Promise.reject();
             return TradingClient.patchResume(host, uuid)
-        }
+        },
+        deleteTrading: async (uuid: string) => {
+            if (!host) return Promise.reject();
+            return TradingClient.delete(host, uuid)
+                .then(() => mutate())
+        },
     }
 }
 

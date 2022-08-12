@@ -1,4 +1,4 @@
-import {Button, Col, Row, Table} from "antd";
+import {Button, Col, Row, Space, Table} from "antd";
 import LongText from "../LongText";
 import {TradingDto} from "../../trading/trading";
 import {TradingState} from "../../trading/trading-state";
@@ -10,7 +10,7 @@ import useTradings from "@hooks/useTradings";
 const TradingsTable = () => {
     const navigate = useNavigate();
     const {getMarketByAddress, getBaseSymbol, getContractByAddress} = useContracts();
-    const {tradings, stop, resume} = useTradings();
+    const {tradings, stop, resume, deleteTrading} = useTradings();
     const onStateChange = (row: TradingDto, stateToStop: boolean) => {
         if (!row.uuid) return;
         if (stateToStop) {
@@ -18,6 +18,11 @@ const TradingsTable = () => {
         } else {
             resume(row.uuid).catch(handleErrorNotification);
         }
+    }
+    const onDeleteClicked = (row: TradingDto) => {
+        if (!row.uuid) return;
+        deleteTrading(row.uuid)
+            .catch(handleErrorNotification);
     }
     return (
         <>
@@ -77,24 +82,34 @@ const TradingsTable = () => {
                         },
                     }, {
                         title: 'Actions',
+                        fixed: 'right',
+                        align: 'center',
                         render: (row: TradingDto) => (
-                            <Button
-                                style={{width: 80}}
-                                type={'primary'}
-                                danger={row.state !== TradingState.STOP}
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    if (row.state === TradingState.CLOSE_FOR_STOP) return;
-                                    onStateChange(row, row.state !== TradingState.STOP);
-                                }}>
-                                {
-                                    row.state === TradingState.STOP
-                                        ? 'Resume' :
-                                    row.state === TradingState.CLOSE_FOR_STOP
-                                        ? 'Waiting...' : 'Stop'
-                                }
-                            </Button>
+                            <Space>
+                                <Button
+                                    style={{width: 80}}
+                                    type={'primary'}
+                                    danger={row.state !== TradingState.STOP}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (row.state === TradingState.CLOSE_FOR_STOP) return;
+                                        onStateChange(row, row.state !== TradingState.STOP);
+                                    }}>
+                                    {
+                                        row.state === TradingState.STOP
+                                            ? 'Resume' :
+                                        row.state === TradingState.CLOSE_FOR_STOP
+                                            ? 'Waiting...' : 'Stop'
+                                    }
+                                </Button>
+                                <Button
+                                    danger
+                                    onClick={e => {
+                                        e.stopPropagation();
+                                        onDeleteClicked(row);
+                                    }}
+                                >Delete</Button>
+                            </Space>
                         )
                     }
                 ]}

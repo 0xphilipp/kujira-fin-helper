@@ -42,6 +42,11 @@ const TradingClient = ({
             method: 'post',
         })
     },
+    delete(host: string, id: string) {
+        return fetch(`${host}/tradings/${id}`, {
+            method: 'delete',
+        });
+    }
 })
 
 export default TradingClient;
