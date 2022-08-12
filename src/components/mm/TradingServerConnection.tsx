@@ -51,6 +51,7 @@ const TradingServerConnection = () => {
             <Form.Item
                 name={'server'}
                 label={'Connect Server'}
+                tooltip={<span>You can download and install it <a href={'https://github.com/kht2199/kujira-fin-market-making'} target={'_blank'}>here</a></span>}
                 initialValue={host || 'http://localhost:3000'}
                 rules={[{
                     required: true,
