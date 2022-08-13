@@ -104,9 +104,12 @@ const TradingsTable = () => {
                                 </Button>
                                 <Button
                                     danger
+                                    type={row.state === TradingState.STOP ? 'primary' : 'default'}
                                     onClick={e => {
                                         e.stopPropagation();
-                                        onDeleteClicked(row);
+                                        if (row.state === TradingState.STOP) {
+                                            onDeleteClicked(row);
+                                        }
                                     }}
                                 >Delete</Button>
                             </Space>
