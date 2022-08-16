@@ -55,9 +55,6 @@ const TradingServerConnection = () => {
                 initialValue={host || 'http://localhost:3000'}
                 rules={[{
                     required: true,
-                    validator(rule, value) {
-                        return /^((http|https?:\/\/)|(www.))(?:([a-zA-Z]+)|(\d+\.\d+.\d+.\d+)):\d{4}$/.test(value) ? Promise.resolve() : Promise.reject()
-                    }
                 }]}
             >
                 <Input type={'url'} disabled={connected} />
