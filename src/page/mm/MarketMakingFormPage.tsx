@@ -134,8 +134,7 @@ const MarketMakingFormPage = () => {
                 </Form.Item>
                 <Form.Item
                     label={'Target Rate'}
-                    validateStatus={rate && targetRate && Math.abs(rate - targetRate) > 0.02 ? 'warning' : undefined}
-                    help={`If the gap between the two values is large, a lot of sell/buy can occur to close the gap.`}
+                    validateStatus={rate && targetRate && Math.abs(rate - targetRate) > 0.01 ? 'warning' : undefined}
                     extra={contract && rate && <div>Current Balance Rate is <Button style={{padding: 0}} type={'link'} onClick={() => setTargetRate(rate)}>{(rate * 100).toFixed(5)}%</Button></div>}
                 >
                     <InputNumber

@@ -14,7 +14,7 @@ const WalletsTable = () => {
         <>
             <h2>Wallet</h2>
             <Table
-                rowKey={'account'}
+                rowKey={row => row.account.address}
                 columns={[
                     {
                         title: 'Endpoint',
