@@ -17,7 +17,6 @@ const TradingClient = ({
                 'Content-type': 'application/json'
             }
         })
-            .then(res => res.json())
     },
     putTrading(host: string, values: TradingAddDto) {
         return fetch(`${host}/tradings`, {
@@ -26,7 +25,7 @@ const TradingClient = ({
             headers: {
                 'Content-type': 'application/json'
             }
-        }).then(res => res.json())
+        })
     },
     getInfo(host: string) {
         return fetch(`${host}/info`)

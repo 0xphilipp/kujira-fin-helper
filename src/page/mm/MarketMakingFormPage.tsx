@@ -62,7 +62,6 @@ const MarketMakingFormPage = () => {
         (page === 'Modify' && id
             ? TradingClient.postTrading(host, id, dto)
             : TradingClient.putTrading(host, dto))
-            .then(handleResponseErrorNotification)
             .then(() => navigate('/market-making'))
             .catch(handleErrorNotification);
     }

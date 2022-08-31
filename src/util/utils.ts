@@ -13,8 +13,8 @@ export const handleResponseErrorNotification = (res: any) => {
 }
 
 export const handleErrorNotification = (e: any) => {
+    console.error(e)
     if (e.message) {
-        console.error(e);
         notification.open({
             message: e.name,
             description: e.message,
