@@ -15,7 +15,7 @@ const App = () => {
                 <MetaHead/>
                 <Header />
                 <Routes>
-                    <Route path="/*" element={<TradingPage />}/>
+                    <Route path={"/*"} element={<TradingPage />}/>
                     <Route path={'/market-making'} element={<MarketMakingPage />} />
                     <Route path={'/market-making/form/:id'} element={<MarketMakingFormPage />} />
                     <Route path={'/market-making/form'} element={<MarketMakingFormPage />} />

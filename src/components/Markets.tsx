@@ -6,7 +6,6 @@ import useBalances from "@hooks/useBalances";
 import useContracts from "@hooks/useContracts";
 import useContract from "@hooks/useContract";
 import useWallet from "@hooks/useWallet";
-import useOrderRequest from "@hooks/useOrderRequest";
 
 interface MarketsProps {
 }
@@ -16,7 +15,6 @@ type Market = 'axlUSDC' | 'ATOM' | 'OSMO';
 const markets: Market[] = ['axlUSDC', 'ATOM', 'OSMO'];
 
 const Markets = ({}: MarketsProps) => {
-    const {changePrice} = useOrderRequest();
     const {wallet} = useWallet();
     const {contract, setContract} = useContract();
     const {base, quote, baseSymbol, quoteSymbol} = useMarketPrice();
@@ -76,13 +74,13 @@ const Markets = ({}: MarketsProps) => {
             </Row>
             <Row align={'middle'} gutter={16} style={{margin: "5px 0 5px"}}>
                 <Col>
-                    Sell <Button style={{padding: 0}} type={'link'} onClick={() => changePrice(base)}>{base}</Button> {quoteSymbol}
+                    Sell <Button style={{padding: 0}} type={'link'}>{base}</Button> {quoteSymbol}
                 </Col>
                 <Col>
-                    Buy <Button style={{padding: 0}} type={'link'} onClick={() => changePrice(quote)}>{quote}</Button> {quoteSymbol}
+                    Buy <Button style={{padding: 0}} type={'link'}>{quote}</Button> {quoteSymbol}
                 </Col>
                 <Col>
-                    Average <Button style={{padding: 0}} type={'link'} onClick={() => changePrice(average)}>{average}</Button> {quoteSymbol}
+                    Average <Button style={{padding: 0}} type={'link'}>{average}</Button> {quoteSymbol}
                 </Col>
             </Row>
             <Row align={'middle'} gutter={16} style={{margin: "0 0 5px"}}>

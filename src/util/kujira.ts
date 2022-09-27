@@ -76,7 +76,11 @@ async function sign(endpoint: string) {
 let account: Wallet | null = null;
 
 export const toSymbol = (denom: Denom) => {
-    return denoms.get(denom)?.symbol || denom;
+    const dn = denoms.get(denom);
+    if (dn) {
+        return dn.symbol;
+    }
+    return denom.slice(0, 20) + '...'
 }
 
 const kujira = {

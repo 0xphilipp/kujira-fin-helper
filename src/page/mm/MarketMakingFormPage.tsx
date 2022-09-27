@@ -5,7 +5,7 @@ import {TradingAddDto, TradingDto} from "../../trading/trading";
 import useContracts from "@hooks/useContracts";
 import TradingClient from "../../client/trading-client";
 import useServers from "@hooks/useServers";
-import {handleErrorNotification, handleResponseErrorNotification} from "@util/utils";
+import {handleErrorNotification} from "@util/utils";
 import useWalletBalance from "@hooks/useWalletBalance";
 import useContract from "@hooks/useContract";
 

@@ -1,4 +1,3 @@
-import OrderRequest from "../content/OrderRequest";
 import {toSymbol} from "@util/kujira";
 import {InputNumber} from "antd";
 

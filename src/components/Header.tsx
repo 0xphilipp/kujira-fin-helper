@@ -10,7 +10,7 @@ const styleHeaderCol = {
     fontSize: 15,
 }
 
-const Header = ({}: HeaderProps) => {
+const Header = (props: HeaderProps) => {
     const {wallet, connect, disconnect} = useWallet();
     const [menu, setMenu] = useState('0');
     return (
@@ -26,14 +26,20 @@ const Header = ({}: HeaderProps) => {
                             mode="horizontal"
                             defaultSelectedKeys={[menu]}
                             onClick={({key}) => setMenu(key)}
+                            inlineCollapsed={false}
                             items={[
-                            {
-                                key: `Trading`,
-                                label: <Link to={'/'}>Trading</Link>,
-                            }, {
-                                key: 'Market Making',
-                                label: <Link to={'/market-making'}>Market Making</Link>,
-                            }]}
+                                {
+                                    key: 'Balances',
+                                    label: <Link to={'/balances'}>Wallet</Link>,
+                                },
+                                {
+                                    key: `Orders`,
+                                    label: <Link to={'/orders'}>Orders</Link>,
+                                }, {
+                                    key: 'Market Making',
+                                    label: <Link to={'/market-making'}>Market Making</Link>,
+                                }
+                            ]}
                         />
                     </Col>
                 </Row>
@@ -55,7 +61,7 @@ const Header = ({}: HeaderProps) => {
                 {!wallet &&
                 <Row gutter={8}>
                     <Col>
-                        <Button onClick={() => connect('kaiyo-1')}>connect kaiyo-1</Button>
+                        <Button onClick={() => connect('kaiyo-1')}>Connect Wallet</Button>
                     </Col>
                 </Row>}
             </Col>
