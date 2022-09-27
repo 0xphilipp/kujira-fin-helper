@@ -108,7 +108,7 @@ const MarketMakingFormPage = () => {
                         }}
                         disabled={page === 'Modify'}
                     >
-                        {contracts.map(c => (
+                        {contracts && contracts.map(c => (
                             <Select.Option key={c.address} value={c.address}>{getMarket(c)}</Select.Option>
                         ))}
                     </Select>

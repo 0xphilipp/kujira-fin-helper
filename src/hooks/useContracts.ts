@@ -1,10 +1,17 @@
-import contractJson from '../data/contracts.json';
-import {toSymbol} from "@util/kujira";
 import {useCallback, useMemo} from "react";
+import useSWR from "swr";
+import useDenoms from "@hooks/useDenoms";
 
 const useContracts = () => {
-    const contracts = useMemo(() => contractJson as Contract[], []);
+    const configPath = 'https://raw.githubusercontent.com/kht2199/kujira-config/main/';
+    const {toSymbol} = useDenoms();
+    const { data: contracts = [] } = useSWR<Contract[]>(
+        ['contract/markets.json'],
+            path => fetch(`${configPath}${path}`)
+                .then(res => res.json())
+    );
     const contractAddressMap = useMemo(() => {
+        if (!contracts) return new Map();
         const map = new Map();
         contracts.forEach(c => map.set(c.address, c));
         return map;

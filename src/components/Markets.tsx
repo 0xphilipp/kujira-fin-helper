@@ -1,4 +1,3 @@
-import {toSymbol} from "@util/kujira";
 import {Button, Col, Row, Select} from "antd";
 import React, {useEffect, useMemo, useState} from "react";
 import useMarketPrice from "@hooks/useMarketPrice";
@@ -6,6 +5,7 @@ import useBalances from "@hooks/useBalances";
 import useContracts from "@hooks/useContracts";
 import useContract from "@hooks/useContract";
 import useWallet from "@hooks/useWallet";
+import useDenoms from "@hooks/useDenoms";
 
 interface MarketsProps {
 }
@@ -15,6 +15,7 @@ type Market = 'axlUSDC' | 'ATOM' | 'OSMO';
 const markets: Market[] = ['axlUSDC', 'ATOM', 'OSMO'];
 
 const Markets = ({}: MarketsProps) => {
+    const {toSymbol} = useDenoms();
     const {wallet} = useWallet();
     const {contract, setContract} = useContract();
     const {base, quote, baseSymbol, quoteSymbol} = useMarketPrice();
@@ -22,7 +23,7 @@ const Markets = ({}: MarketsProps) => {
     const {balances} = useBalances();
     const [market, setMarket] = useState<Market | undefined>(undefined);
     const filteredContracts = useMemo(() => {
-        return contracts.filter(c => toSymbol(c.denoms.quote) === market);
+        return contracts ? contracts.filter(c => toSymbol(c.denoms.quote) === market) : [];
     }, [contracts, wallet, market]);
     const [bals, setBals] = useState<number[]>([]);
     const [average, setAverage] = useState<number>(0);
@@ -60,14 +61,16 @@ const Markets = ({}: MarketsProps) => {
                     </Select>
                 </Col>
                 <Col>
-                    <Select value={contract.address} onChange={c => filteredContracts && setContract(filteredContracts.filter(c2 => c2.address === c)[0])}
+                    <Select value={contract.address} onChange={c => filteredContracts && setContract(filteredContracts.filter((c2: Contract) => c2.address === c)[0])}
                             style={{width: '160px', textAlign: 'right'}}>
-                        {wallet && filteredContracts && filteredContracts.map(c => (
+                        {wallet && filteredContracts && filteredContracts.map((c: Contract) => (
                             <Select.Option
                                 key={c.address}
                                 value={c.address}
                                 style={{textAlign: 'right'}}
-                            >{toSymbol(c.denoms.base)} / {toSymbol(c.denoms.quote)}</Select.Option>
+                            >
+                                {toSymbol(c.denoms.base)} / {toSymbol(c.denoms.quote)}
+                            </Select.Option>
                         ))}
                     </Select>
                 </Col>

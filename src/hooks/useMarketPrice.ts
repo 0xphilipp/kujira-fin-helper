@@ -1,10 +1,12 @@
 import useSWR from "swr";
-import kujira, {toSymbol} from "@util/kujira";
+import kujira from "@util/kujira";
 import {useMemo} from "react";
 import useContract from "./useContract";
 import {handleErrorNotification} from "@util/utils";
+import useDenoms from "@hooks/useDenoms";
 
 const useMarketPrice = () => {
+    const {toSymbol} = useDenoms();
     const {contract} = useContract();
     const {data = {base: [], quote: []}} = useSWR(
         [contract ? `/price/${contract.address}` : undefined, contract],

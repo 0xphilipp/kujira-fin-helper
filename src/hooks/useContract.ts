@@ -1,9 +1,10 @@
 import useSWR from "swr";
 import KEY from "./key";
-import {toSymbol} from "@util/kujira";
 import {useMemo} from "react";
+import useDenoms from "@hooks/useDenoms";
 
 const useContract = () => {
+    const {toSymbol} = useDenoms();
     const {data, mutate} = useSWR<Contract | undefined>(
         KEY.CONTRACT,
         { revalidateOnFocus: false }

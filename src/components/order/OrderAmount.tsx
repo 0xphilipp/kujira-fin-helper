@@ -1,5 +1,5 @@
-import {toSymbol} from "@util/kujira";
 import {InputNumber} from "antd";
+import useDenoms from "@hooks/useDenoms";
 
 interface OrderAmountProps {
     amount: number;
@@ -7,6 +7,7 @@ interface OrderAmountProps {
 }
 
 const OrderAmount = ({amount, denom}: OrderAmountProps) => {
+    const {toSymbol} = useDenoms();
     let precision = 4;
     return <InputNumber
         className={'borderless-input-number'}

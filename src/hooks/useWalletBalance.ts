@@ -1,11 +1,12 @@
 import useSWR from "swr";
 import WalletClient from "../client/wallet-client";
-import denoms from '../data/denoms.json';
 import {useMemo} from "react";
 import useContract from "@hooks/useContract";
 import useMarketPrice from "@hooks/useMarketPrice";
+import useDenoms from "@hooks/useDenoms";
 
 const useWalletBalance = (host: string | undefined, wallet: string | null) => {
+    const {denomsMap} = useDenoms();
     const {contract, base, quote} = useContract();
     const {price} = useMarketPrice();
     const { data: balances } = useSWR<Balance[] | undefined>([`/wallets/${wallet}/balances`, wallet],
@@ -15,7 +16,7 @@ const useWalletBalance = (host: string | undefined, wallet: string | null) => {
 
     const getBalanceByDenom = (denom: string): number => {
         if (!balances) return 0;
-        const denomConfig = denoms.filter(d => d.denom === denom)[0];
+        const denomConfig = denomsMap.get(denom);
         if (!denomConfig) return 0;
         return balances
             .filter(b => b.denom === denom)

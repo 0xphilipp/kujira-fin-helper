@@ -7,17 +7,9 @@ import {ExecuteResult, SigningCosmWasmClient} from "@cosmjs/cosmwasm-stargate";
 import {MsgSend} from "cosmjs-types/cosmos/bank/v1beta1/tx";
 import {OrderResponse} from "kujira.js/src/fin";
 import {Buffer} from 'buffer';
-import contractsJson from 'data/contracts.json'
-import denomsJson from 'data/denoms.json';
-
-const contracts = contractsJson as Contract[];
-
-const denoms = new Map();
-
-denomsJson.forEach(d => denoms.set(d.denom, d));
-
-const getDecimalDelta = (contracts: Contract[], denom: string) => denomsJson.filter(c => c.denom === denom)
-    .map(c => (+c.decimal || 0))[0] || 0;
+// import contractsJson from '../../kujira-config/contracts.json'
+// import denomsJson from '../../kujira-config/denoms.json';
+//
 
 const toOrder = (contract: Contract, o: OrderResponse): Order => {
     let state: OrderState = 'Open';
@@ -74,14 +66,6 @@ async function sign(endpoint: string) {
 }
 
 let account: Wallet | null = null;
-
-export const toSymbol = (denom: Denom) => {
-    const dn = denoms.get(denom);
-    if (dn) {
-        return dn.symbol;
-    }
-    return denom.slice(0, 20) + '...'
-}
 
 const kujira = {
     async connect(): Promise<Wallet> {
@@ -167,13 +151,15 @@ const kujira = {
         });
         return client.signAndBroadcast(account.address, msgs, 'auto');
     },
-    async getBalancesByAddress(address: string): Promise<Balance[]> {
-        return fetch(`https://lcd.kaiyo.kujira.setten.io/cosmos/bank/v1beta1/balances/${address}`)
+    async getBalances(wallet: Wallet, contracts: Contract[], getDecimalDelta: Function): Promise<Balance[]> {
+        return fetch(`https://lcd.kaiyo.kujira.setten.io/cosmos/bank/v1beta1/balances/${wallet.account.address}`)
             .then(res => res.json())
-            .then(res => res.balances.map((coin: Coin) => ({amount: `${+coin.amount / 10 ** getDecimalDelta(contracts, coin.denom)}`, denom: (coin.denom as Denom)})))
-    },
-    async getBalances(wallet: Wallet): Promise<Balance[]> {
-        return this.getBalancesByAddress(wallet.account.address);
+            .then(res => {
+                return res.balances.map((coin: Coin) => ({
+                    amount: `${+coin.amount / 10 ** getDecimalDelta(contracts, coin.denom)}`,
+                    denom: (coin.denom as Denom)
+                }));
+            });
     },
     async ordersCancel(wallet: Wallet, contract: Contract, orders: Order[]): Promise<ExecuteResult> {
         const {client, account} = wallet;
