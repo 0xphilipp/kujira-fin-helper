@@ -204,7 +204,7 @@ const MarketMakingFormPage = () => {
               precision={1}
               controls={false}
               onPressEnter={(v) => {
-                const value = +v.target.value;
+                const value = +(v.target as any).value;
                 onRateInputEnter(value);
               }}
             />
