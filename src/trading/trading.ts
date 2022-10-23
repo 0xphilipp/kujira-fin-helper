@@ -1,4 +1,4 @@
-import {TradingState} from "./trading-state";
+import { TradingState } from "./trading-state";
 
 export interface TradingDto {
     uuid?: string;
@@ -8,6 +8,15 @@ export interface TradingDto {
     deltaRates: number[];
     targetRate: number;
     orderAmountMin: number;
+    type: TradingType;
+    min: number;
+    max: number;
+}
+
+export enum TradingType {
+    default = "default",
+    dynamic = "dynamic",
+    grid = "grid",
 }
 
 export interface TradingAddDto {
@@ -16,4 +25,7 @@ export interface TradingAddDto {
     deltaRates: number[];
     targetRate: number | undefined;
     orderAmountMin: number;
+    type: TradingType;
+    min: number;
+    max: number;
 }

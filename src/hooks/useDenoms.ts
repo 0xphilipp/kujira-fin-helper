@@ -1,4 +1,3 @@
-import useSWR from "swr";
 import { useMemo } from "react";
 
 interface DenomJson {

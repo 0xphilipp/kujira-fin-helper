@@ -11,13 +11,14 @@ import {
 } from "antd";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
-import { TradingAddDto, TradingDto } from "../../trading/trading";
+import { TradingAddDto, TradingDto, TradingType } from "../../trading/trading";
 import useContracts from "@hooks/useContracts";
 import TradingClient from "../../client/trading-client";
 import useServers from "@hooks/useServers";
 import { handleErrorNotification } from "@util/utils";
 import useWalletBalance from "@hooks/useWalletBalance";
 import useContract from "@hooks/useContract";
+import useMarketPrice from "@hooks/useMarketPrice";
 
 const MarketMakingFormPage = () => {
   const { id } = useParams();
@@ -31,8 +32,22 @@ const MarketMakingFormPage = () => {
   const [rates, setRates] = useState<number[]>(
     page === "Add" ? [-0.02, -0.01, 0, 0.01, 0.02] : []
   );
+  const [type, setType] = useState(TradingType.default);
+  const [min, setMin] = useState(0);
+  const [max, setMax] = useState(0);
+
+  // const ratio =
+  //   gridOptions.to &&
+  //   gridOptions.from &&
+  //   gridOptions.steps &&
+  //   Math.pow(gridOptions.to / gridOptions.from, 1 / gridOptions.steps);
+
   const [targetRate, setTargetRate] = useState<number>();
-  const { rate } = useWalletBalance(host, account);
+  const { rate, baseBalance, quoteBalance, base, quote } = useWalletBalance(
+    host,
+    account
+  );
+  const { price } = useMarketPrice();
   const { contracts, getMarket, getBaseSymbol, getContractByAddress } =
     useContracts();
   useEffect(() => {
@@ -47,6 +62,9 @@ const MarketMakingFormPage = () => {
         .then((res: TradingDto) => {
           setRates(res.deltaRates);
           setTargetRate(res.targetRate);
+          setMin(res.min);
+          setMax(res.max);
+          setType(res.type);
           setContract(getContractByAddress(res.contract.address));
           form.setFieldsValue(res);
         })
@@ -62,6 +80,35 @@ const MarketMakingFormPage = () => {
       });
     }
   }, [rate]);
+
+  const current = useMemo(() => {
+    // price = 2
+    // min = 1
+    // max = 11
+    // -> 90%
+    let delta = max - min; // 10
+    let current = price - min; // 1
+    let targetRate = Math.max(0, Math.min(1, 1 - current / delta));
+
+    let message = "";
+
+    if (rate && quoteBalance && baseBalance) {
+      if (targetRate > rate) {
+        let wantedBase =
+          ((quoteBalance / (1 - targetRate)) * targetRate) / price;
+        let delta = wantedBase - baseBalance;
+        message =
+          `Deposit ${base} ` + delta.toFixed(2) + " " + targetRate + " " + rate;
+      } else if (targetRate < rate) {
+        let wantedQuote = (baseBalance / targetRate) * (1 - targetRate) * price;
+        let delta = wantedQuote - quoteBalance;
+        message = `Deposit ${quote} ` + delta.toFixed(2);
+      }
+    }
+
+    return { targetRate, message };
+  }, [min, max, price, rate, baseBalance, quoteBalance, base]);
+
   const onSave = async () => {
     if (!host) return;
     const values = await form.validateFields();
@@ -71,6 +118,9 @@ const MarketMakingFormPage = () => {
       targetRate: targetRate,
       contract: values.contract.address,
       orderAmountMin: values.orderAmountMin,
+      type: type,
+      min: min,
+      max: max,
     };
     (page === "Modify" && id
       ? TradingClient.postTrading(host, id, dto)
@@ -191,6 +241,96 @@ const MarketMakingFormPage = () => {
             controls={false}
           />
         </Form.Item>
+
+        <Form.Item label={"type"} name={["type"]}>
+          <Select
+            onChange={(type) => {
+              setType(type);
+            }}
+          >
+            <Select.Option value={TradingType.default}>default</Select.Option>
+
+            <Select.Option value={TradingType.dynamic}>dynamic</Select.Option>
+          </Select>
+        </Form.Item>
+
+        {type === TradingType.dynamic ? (
+          <>
+            <Form.Item label={"min"} name={["min"]}>
+              <InputNumber
+                style={{ width: 150 }}
+                min={0}
+                onChange={(v) => setMin(v ?? 0)}
+                value={min}
+                controls={false}
+              />
+            </Form.Item>
+            <Form.Item
+              label={"max"}
+              name={["max"]}
+              extra={
+                min &&
+                max && (
+                  <div>
+                    Price {price} - Rate {((rate || 0) * 100).toFixed(2)} % -
+                    Target {(current.targetRate * 100).toFixed(2)} -{" "}
+                    {current.message}
+                  </div>
+                )
+              }
+            >
+              <InputNumber
+                style={{ width: 150 }}
+                min={0}
+                onChange={(v) => setMax(v ?? 0)}
+                value={min}
+                controls={false}
+              />
+            </Form.Item>
+
+            {/* <Form.Item
+              label={"steps"}
+              name={["steps"]}
+              extra={
+                gridOptions.from &&
+                gridOptions.to &&
+                gridOptions.steps && (
+                  <>
+                    <div>
+                      {(
+                        (gridOptions.to - gridOptions.from) /
+                        gridOptions.steps
+                      ).toFixed(3)}{" "}
+                      $ ratio: {((ratio! - 1) * 100).toFixed(2)} %
+                    </div>
+                    <div>
+                      {Array.from({ length: gridOptions.steps }, (x, i) =>
+                        (gridOptions.from! * Math.pow(ratio!, i)).toFixed(3)
+                      ).join(", ")}
+                    </div>
+                  </>
+                )
+              }
+            >
+              <InputNumber
+                style={{ width: 150 }}
+                min={5}
+                // max={100}
+                onChange={(v) =>
+                  setGridOptions({
+                    ...gridOptions,
+                    steps: v ?? 0,
+                  })
+                }
+                value={gridOptions.steps}
+                controls={false}
+              />
+            </Form.Item> */}
+          </>
+        ) : (
+          <></>
+        )}
+
         <Form.Item label={"Order Rates"}>
           <Form.Item name={"rate"}>
             <InputNumber
